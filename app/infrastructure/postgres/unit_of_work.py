@@ -3,11 +3,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.postgres.database import async_session_maker
 from app.domain.interfaces.identity import IUserRepository
+from app.domain.interfaces.exercises import IExerciseRepository
 from app.infrastructure.postgres.repos.identity import PostgresUserRepository
+from app.infrastructure.postgres.repos.exercises import PostgresExerciseRepository
 
 
 class IUnitOfWork:
     users: IUserRepository
+    exercises: IExerciseRepository
     async def commit(self) -> None: ...
     async def rollback(self) -> None: ...
 
@@ -21,6 +24,8 @@ class PostgresUnitOfWork(IUnitOfWork):
         self._session = self._session_factory()
 
         self.users = PostgresUserRepository(self._session)
+        self.exercises = PostgresExerciseRepository(self._session)
+
         return self
     
     async def __aexit__(

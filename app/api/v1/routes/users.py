@@ -9,7 +9,7 @@ from app.infrastructure.security.password import hash_password
 from app.application.dto.identity import UserCreateDTO, UserResponseDTO
 
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
 
 @router.post(

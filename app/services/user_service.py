@@ -3,9 +3,11 @@ from uuid import UUID
 from app.domain.identity.user import User, UserProfile
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
 
+
 class UserService:
     def __init__(self, uow: IUnitOfWork) -> None:
         self._uow = uow
+
 
     async def create_user(self, username: str, password_hash: str, profile: UserProfile) -> User:
         if await self._uow.users.exists_by_username(username):
@@ -18,8 +20,10 @@ class UserService:
         await self._uow.commit()
         return user
     
+
     async def get_user(self, user_id: UUID) -> User | None:
         return await self._uow.users.get_by_id(user_id)
+    
     
     async def update_weight(self, user_id: UUID, new_weight: float) -> User:
         user = await self._uow.users.get_by_id(user_id)
