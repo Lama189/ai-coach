@@ -1,0 +1,52 @@
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: coach-db
+    environment:
+      POSTGRES_USER: ${COACH_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${COACH_DB_PASSWORD:-123}
+      POSTGRES_DB: ${COACH_DB_NAME:-ai_coach}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${COACH_DB_USER:-postgres} -d ${COACH_DB_NAME:-ai_coach}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitness_migrations
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${COACH_DB_USER:-postgres}:${COACH_DB_PASSWORD:-123}@postgres:5432/${COACH_DB_NAME:-ai_coach}
+    command: alembic upgrade head
+    volumes:
+      - .:/app
+      - /app/.venv
+    depends_on:
+      postgres:
+        condition: service_healthy  
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitness_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /app/.venv  
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${COACH_DB_USER:-postgres}:${COACH_DB_PASSWORD:-123}@postgres:5432/${COACH_DB_NAME:-ai_coach}
+    depends_on:
+      migrations:
+        condition: service_completed_successfully 
+
+volumes:
+  pg_data:
