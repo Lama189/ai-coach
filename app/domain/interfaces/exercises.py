@@ -26,3 +26,7 @@ class IExerciseRepository(ABC):
     @abstractmethod
     async def exists(self, exercise_name: str) -> bool:
         ...
+
+    @abstractmethod
+    async def get_by_ids(self, exercise_ids: list[UUID]) -> list[Exercise]:
+        ...

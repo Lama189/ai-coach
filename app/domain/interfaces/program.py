@@ -10,14 +10,10 @@ class IWorkoutProgramRepository(ABC):
     async def save(self, program: WorkoutProgram) -> None:
         ...
 
-    @abstractmethod
-    async def get_by_id(self, program_id: UUID) -> WorkoutProgram | None:
-        ...
+    # @abstractmethod
+    # async def get_by_id(self, program_id: UUID) -> WorkoutProgram | None:
+    #     ...
 
     @abstractmethod
-    async def get_user_programs(self, user_id: UUID, only_active: bool = False) -> list[WorkoutProgram]:
-        ...
-
-    @abstractmethod
-    async def delete(self, program_id: UUID) -> None:
+    async def deactivate_all_for_user(self, user_id: UUID) -> None:
         ...

@@ -1,5 +1,3 @@
-# app/infrastructure/postgres/models/__init__.py
-
 from app.infrastructure.postgres.models.base_model import BaseModel
 from app.infrastructure.postgres.models.users import User
 from app.infrastructure.postgres.models.profiles import UserProfile

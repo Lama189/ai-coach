@@ -2,15 +2,27 @@ from types import TracebackType
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.postgres.database import async_session_maker
+
 from app.domain.interfaces.identity import IUserRepository
 from app.domain.interfaces.exercises import IExerciseRepository
+from app.domain.interfaces.program import IWorkoutProgramRepository
+from app.domain.interfaces.workout_day import IWorkoutDayRepository
+from app.domain.interfaces.workout_day_exercise import IWorkoutDayExerciseRepository
+
 from app.infrastructure.postgres.repos.identity import PostgresUserRepository
 from app.infrastructure.postgres.repos.exercises import PostgresExerciseRepository
+from app.infrastructure.postgres.repos.programs import PostgresWorkoutProgramRepository
+from app.infrastructure.postgres.repos.workout_days import PostgresWorkoutDayRepository
+from app.infrastructure.postgres.repos.workout_day_exercises import PostgresWorkoutDayExerciseRepository
 
 
 class IUnitOfWork:
     users: IUserRepository
     exercises: IExerciseRepository
+    programs: IWorkoutProgramRepository
+    workout_days: IWorkoutDayRepository
+    workout_days_exercise: IWorkoutDayExerciseRepository
+
     async def commit(self) -> None: ...
     async def rollback(self) -> None: ...
 
@@ -25,6 +37,9 @@ class PostgresUnitOfWork(IUnitOfWork):
 
         self.users = PostgresUserRepository(self._session)
         self.exercises = PostgresExerciseRepository(self._session)
+        self.programs = PostgresWorkoutProgramRepository(self._session)
+        self.workout_days = PostgresWorkoutDayRepository(self._session)
+        self.workout_days_exercise = PostgresWorkoutDayExerciseRepository(self._session)
 
         return self
     

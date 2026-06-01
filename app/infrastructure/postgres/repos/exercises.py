@@ -58,6 +58,16 @@ class PostgresExerciseRepository(IExerciseRepository):
         return (await self._session.execute(stmt)).scalar_one()
     
 
+    async def get_by_ids(self, exercise_ids: list[UUID]) -> list[Exercise]:
+        if not exercise_ids:
+            return []
+        
+        stmt = select(ExerciseModel).where(ExerciseModel.id.in_(exercise_ids))
+        models = (await self._session.execute(stmt)).scalars().all()   
+
+        return [self._to_domain(model) for model in models]                              
+
+
     def _to_domain(self, model: ExerciseModel) -> Exercise:
         return Exercise(
             name=model.name,

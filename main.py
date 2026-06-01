@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 from app.api.v1.routes.users import router as users_router
 from app.api.v1.routes.exercises import router as exercises_router
+from app.api.v1.routes.programs import router as programs_router
 
 
 logging.basicConfig(level=logging.INFO)
@@ -27,3 +28,4 @@ async def root():
 
 app.include_router(users_router)
 app.include_router(exercises_router)
+app.include_router(programs_router)
