@@ -1,6 +1,7 @@
 import logging
 
 import app.infrastructure.postgres.models
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy import text
 
@@ -8,13 +9,21 @@ from app.api.v1.routes.users import router as users_router
 from app.api.v1.routes.exercises import router as exercises_router
 from app.api.v1.routes.programs import router as programs_router
 
+from app.api.v1.dependencies import get_embedding_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    get_embedding_service()
+    yield
+
+
 app = FastAPI(
-    title="AI Coach API"
+    title="AI Coach API",
+    lifespan=lifespan
 )
 
 

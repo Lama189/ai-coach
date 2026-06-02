@@ -8,7 +8,7 @@ from app.domain.training.exercise import Exercise
 class IExerciseRepository(ABC):
 
     @abstractmethod
-    async def save_exercise(self, exercise: Exercise) -> None:
+    async def save_exercise(self, exercise: Exercise, embedding: list[float] | None = None) -> None:
         ...
 
     @abstractmethod
@@ -29,7 +29,13 @@ class IExerciseRepository(ABC):
     ) -> list[Exercise]:
         ...
 
+    async def find_familiar(
+        self,
+        embedding: list[float],
+        threshold: float = 0.85,
+    ) -> Exercise | None:
+        ...
+
     @abstractmethod
     async def get_by_ids(self, exercise_ids: list[UUID]) -> list[Exercise]:
-    
         ...

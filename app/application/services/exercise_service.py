@@ -3,11 +3,12 @@ from uuid import UUID
 from app.domain.training.exercise import Exercise
 from app.domain.enums import MuscleGroup
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
-
+from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 
 class ExerciseService:
-    def __init__(self, uow: IUnitOfWork) -> None:
+    def __init__(self, uow: IUnitOfWork, embedder: SentenceTransformerEmbeddingService) -> None:
         self._uow = uow
+        self._embedder = embedder 
 
 
     async def create_exercise(
@@ -19,9 +20,14 @@ class ExerciseService:
         if await self._uow.exercises.get_by_name(name):
             raise ValueError(f"Название упражнения '{name}' уже занято")
         
+        embedding = await self._embedder.get_embedding(f"{name} {muscle_group}")
+        similar = await self._uow.exercises.find_familiar(embedding)
+        if similar:
+            raise ValueError(f"Такое упражнение уже существует: f{similar.name}")
+        
         exercise = Exercise(name=name, muscle_group=muscle_group, description=description)
 
-        await self._uow.exercises.save_exercise(exercise)
+        await self._uow.exercises.save_exercise(exercise, embedding)
         await self._uow.commit()
         return exercise
     

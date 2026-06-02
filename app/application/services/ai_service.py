@@ -26,6 +26,7 @@ from app.domain.training.program import WorkoutProgram
 from app.domain.training.workout_day import WorkoutDay
 from app.domain.training.workout_day_exercise import WorkoutDayExercise
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 
 
 logger = logging.getLogger(__name__)
@@ -38,8 +39,9 @@ class AgentState(TypedDict):
 
 
 class AIService:
-    def __init__(self, uow: IUnitOfWork, api_key: str):
+    def __init__(self, uow: IUnitOfWork, embedder: SentenceTransformerEmbeddingService, api_key: str):
         self._uow = uow
+        self._embedder = embedder
         self._llm = ChatGroq(
             api_key=api_key,
             model="llama-3.3-70b-versatile",
@@ -64,7 +66,6 @@ class AIService:
                 Ты элитный персональный фитнес-тренер.
 
                 Профиль клиента:
-
                 Имя: {user.username}
                 Пол: {profile.gender.value}
                 Возраст: {profile.age}
@@ -74,7 +75,6 @@ class AIService:
                 Уровень подготовки: {profile.experience_level.value}
 
                 Правила работы:
-
                 1. Используй только упражнения, полученные из инструментов.
                 2. Перед составлением программы вызови search_exercises_batch со списком всех нужных упражнений сразу.
                 3. Если каких-то упражнений нет — вызови create_exercises_batch со списком всех недостающих упражнений сразу.
@@ -83,10 +83,16 @@ class AIService:
                 6. Группируй упражнения в один вызов инструмента, не вызывай инструменты по одному.
                 7. Когда все упражнения найдены — заверши работу с инструментами и составь программу.
 
+                Правила именования упражнений:
+                - Только английский язык
+                - Title Case: каждое слово с заглавной буквы (Bench Press, Pull Up, Bicep Curl)
+                - Без дефисов: "Pull Up" не "Pull-ups", "Push Up" не "Push-up"
+                - Без множественного числа: "Pull Up" не "Pull Ups", "Squat" не "Squats"
+                - Без лишних слов: "Bench Press" не "Barbell Flat Bench Press"
+
                 Допустимые значения muscle_group (строго lowercase):
                 chest, back, legs, shoulders, biceps, triceps, core, full_body, cardio
                 """
-
 
     def _build_tools(self):
         @tool(args_schema=SearchExercisesBatchInput, description="Найти несколько упражнений в базе данных за один вызов.")
@@ -112,12 +118,18 @@ class AIService:
                     results.append(f"id={existing.id} | name={existing.name}")
                     continue
 
+                embedding = await self._embedder.get_embedding(f"{ex.name} {ex.muscle_group}")
+                similar = await self._uow.exercises.find_familiar(embedding)
+                if similar:
+                    results.append(f"id={similar.id} | name={similar.name}")
+                    continue
+
                 exercise = Exercise(
                     name=ex.name,
                     muscle_group=MuscleGroup(ex.muscle_group.lower()),
                     description=ex.description,
                 )
-                await self._uow.exercises.save_exercise(exercise)
+                await self._uow.exercises.save_exercise(exercise, embedding)
                 results.append(f"id={exercise.id} | name={exercise.name}")
 
             await self._uow.commit()

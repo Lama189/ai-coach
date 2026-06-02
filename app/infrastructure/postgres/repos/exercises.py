@@ -16,7 +16,7 @@ class PostgresExerciseRepository(IExerciseRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def save_exercise(self, exercise: Exercise) -> None:
+    async def save_exercise(self, exercise: Exercise, embedding: list[float] | None = None) -> None:
         stmt = select(ExerciseModel).where(
             ExerciseModel.name.ilike(f"%{normalize(exercise.name)}%")
         )
@@ -27,9 +27,15 @@ class PostgresExerciseRepository(IExerciseRepository):
         if existing is None:
             model = self._to_model(exercise)
             self._session.add(model)
+
+            if embedding:
+                model.embedding = embedding
         else:
             existing.muscle_group = exercise.muscle_group
             existing.description = str(exercise.description)
+
+            if embedding:
+                existing.embedding = embedding
 
 
     async def get_by_id(self, exercise_id: UUID) -> Exercise | None:
@@ -64,7 +70,7 @@ class PostgresExerciseRepository(IExerciseRepository):
 
     async def get_by_name(self, name: str) -> Exercise | None:
         stmt = select(ExerciseModel).where(
-            ExerciseModel.name.ilike(name.strip())
+            ExerciseModel.name.ilike(f"%{normalize(name)}%")
         )
 
         result = await self._session.execute(stmt)
@@ -84,6 +90,32 @@ class PostgresExerciseRepository(IExerciseRepository):
 
         return [self._to_domain(model) for model in models]
     
+
+    async def find_familiar(
+        self,
+        embedding: list[float],
+        threshold: float = 0.85,
+    ) -> Exercise | None:
+        stmt = (
+            select(ExerciseModel)
+            .where(
+                ExerciseModel.embedding.cosine_distance(embedding)
+                <= (1 - threshold)
+            )
+            .order_by(
+                ExerciseModel.embedding.cosine_distance(embedding)
+            )
+            .limit(1)
+        )
+
+        result = await self._session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        if model is None:
+            return None
+
+        return self._to_domain(model)
+
 
     def _to_model(self, exercise: Exercise) -> ExerciseModel:
         return ExerciseModel(

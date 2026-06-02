@@ -25,6 +25,7 @@ def upgrade() -> None:
                existing_type=postgresql.ENUM('CHEST', 'BACK', 'LEGS', 'SHOULDERS', 'ARMS', 'CORE', 'FULL_BODY', 'CARDIO', name='muscle_group'),
                type_=sa.String(length=50),
                existing_nullable=False)
+    op.execute('DROP TYPE muscle_group')
     # ### end Alembic commands ###
 
 

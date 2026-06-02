@@ -2,12 +2,16 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from app.services.program_service import WorkoutProgramService
-from app.services.ai_service import AIService
+from app.application.services.ai_service import AIService
+from app.application.services.program_service import WorkoutProgramService
 
-from app.api.v1.dependencies import get_uow, get_llm_api_key
+from app.api.v1.dependencies import (
+    get_uow, 
+    get_llm_api_key, 
+    get_embedding_service
+)
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
-from app.infrastructure.security.password import hash_password 
+from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.application.dto.program import WorkoutProgramCreate, WorkoutProgramResponse
 
 
@@ -39,9 +43,10 @@ async def create_workout_program(dto: WorkoutProgramCreate, uow: IUnitOfWork = D
 async def generate_workout_program(
     user_id: UUID, 
     uow: IUnitOfWork = Depends(get_uow),
+    embedder: SentenceTransformerEmbeddingService = Depends(get_embedding_service),
     api_key: str = Depends(get_llm_api_key)
 ):
-    service = AIService(uow, api_key)
+    service = AIService(uow, embedder, api_key)
     try:
         return await service.generate_workout(user_id)
     except ValueError as e:

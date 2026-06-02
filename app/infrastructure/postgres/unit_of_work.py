@@ -8,12 +8,14 @@ from app.domain.interfaces.exercises import IExerciseRepository
 from app.domain.interfaces.program import IWorkoutProgramRepository
 from app.domain.interfaces.workout_day import IWorkoutDayRepository
 from app.domain.interfaces.workout_day_exercise import IWorkoutDayExerciseRepository
+from app.domain.interfaces.insights import IUserInsightRepository
 
 from app.infrastructure.postgres.repos.identity import PostgresUserRepository
 from app.infrastructure.postgres.repos.exercises import PostgresExerciseRepository
 from app.infrastructure.postgres.repos.programs import PostgresWorkoutProgramRepository
 from app.infrastructure.postgres.repos.workout_days import PostgresWorkoutDayRepository
 from app.infrastructure.postgres.repos.workout_day_exercises import PostgresWorkoutDayExerciseRepository
+from app.infrastructure.postgres.repos.insights import PostgresUserInsightRepository
 
 
 class IUnitOfWork:
@@ -22,6 +24,7 @@ class IUnitOfWork:
     programs: IWorkoutProgramRepository
     workout_days: IWorkoutDayRepository
     workout_days_exercise: IWorkoutDayExerciseRepository
+    insights: IUserInsightRepository
 
     async def commit(self) -> None: ...
     async def rollback(self) -> None: ...
@@ -40,6 +43,7 @@ class PostgresUnitOfWork(IUnitOfWork):
         self.programs = PostgresWorkoutProgramRepository(self._session)
         self.workout_days = PostgresWorkoutDayRepository(self._session)
         self.workout_days_exercise = PostgresWorkoutDayExerciseRepository(self._session)
+        self.insights = PostgresUserInsightRepository(self._session)
 
         return self
     

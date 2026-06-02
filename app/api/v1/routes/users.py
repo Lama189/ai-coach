@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from starlette.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
-from app.services.user_service import UserService
+from app.application.services.user_service import UserService
 from app.api.v1.dependencies import get_uow
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
 from app.infrastructure.security.password import hash_password 
