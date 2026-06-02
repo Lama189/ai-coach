@@ -16,7 +16,7 @@ class ExerciseService:
         muscle_group: MuscleGroup, 
         description: str | None = None
     ) -> Exercise:
-        if await self._uow.exercises.exists(name):
+        if await self._uow.exercises.get_by_name(name):
             raise ValueError(f"Название упражнения '{name}' уже занято")
         
         exercise = Exercise(name=name, muscle_group=muscle_group, description=description)

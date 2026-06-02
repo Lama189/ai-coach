@@ -21,7 +21,7 @@ class Exercise(BaseModel):
 
     id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid4)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    muscle_group: Mapped[MuscleGroup] = mapped_column(SqlEnum(MuscleGroup, name="muscle_group"), nullable=False)
+    muscle_group: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
 
     workout_days: Mapped[list["WorkoutDayExercise"]] = relationship("WorkoutDayExercise", back_populates="exercise")

@@ -1,5 +1,5 @@
 from uuid import UUID
-from sqlalchemy import select, exists
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.exercise import Exercise
@@ -8,31 +8,37 @@ from app.domain.interfaces.exercises import IExerciseRepository
 from app.infrastructure.postgres.models.exercises import Exercise as ExerciseModel
 
 
+def normalize(name: str) -> str:
+    return name.strip().lower()
+
+
 class PostgresExerciseRepository(IExerciseRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    
     async def save_exercise(self, exercise: Exercise) -> None:
-        existing = await self._session.get(ExerciseModel, exercise.id)
+        stmt = select(ExerciseModel).where(
+            ExerciseModel.name.ilike(f"%{normalize(exercise.name)}%")
+        )
+
+        result = await self._session.execute(stmt)
+        existing = result.scalar_one_or_none()
 
         if existing is None:
             model = self._to_model(exercise)
             self._session.add(model)
         else:
-            existing.name = exercise.name
             existing.muscle_group = exercise.muscle_group
             existing.description = str(exercise.description)
 
-        await self._session.flush()
-
 
     async def get_by_id(self, exercise_id: UUID) -> Exercise | None:
-        stmt = (select(ExerciseModel).where(ExerciseModel.id == exercise_id))
-        model = (await self._session.execute(stmt)).scalar_one_or_none()
+        stmt = select(ExerciseModel).where(ExerciseModel.id == exercise_id)
+        result = await self._session.execute(stmt)
+        model = result.scalar_one_or_none()
         return self._to_domain(model) if model else None
-
     
+
     async def search(
         self,
         query: str | None = None,
@@ -49,38 +55,49 @@ class PostgresExerciseRepository(IExerciseRepository):
             stmt = stmt.where(ExerciseModel.muscle_group == muscle_group)
 
         stmt = stmt.order_by(ExerciseModel.muscle_group).limit(limit).offset(offset)
-        models = (await self._session.execute(stmt)).scalars().all()
+
+        result = await self._session.execute(stmt)
+        models = result.scalars().all()
+
         return [self._to_domain(model) for model in models]
+    
 
+    async def get_by_name(self, name: str) -> Exercise | None:
+        stmt = select(ExerciseModel).where(
+            ExerciseModel.name.ilike(name.strip())
+        )
 
-    async def exists(self, exercise_name: str) -> bool:
-        stmt = select(exists().where(ExerciseModel.name == exercise_name))
-        return (await self._session.execute(stmt)).scalar_one()
+        result = await self._session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        return self._to_domain(model) if model else None
     
 
     async def get_by_ids(self, exercise_ids: list[UUID]) -> list[Exercise]:
         if not exercise_ids:
             return []
-        
-        stmt = select(ExerciseModel).where(ExerciseModel.id.in_(exercise_ids))
-        models = (await self._session.execute(stmt)).scalars().all()   
 
-        return [self._to_domain(model) for model in models]                              
+        stmt = select(ExerciseModel).where(ExerciseModel.id.in_(exercise_ids))
+
+        result = await self._session.execute(stmt)
+        models = result.scalars().all()
+
+        return [self._to_domain(model) for model in models]
+    
+
+    def _to_model(self, exercise: Exercise) -> ExerciseModel:
+        return ExerciseModel(
+            id=exercise.id,
+            name=exercise.name,
+            muscle_group=exercise.muscle_group.value, 
+            description=exercise.description,
+        )
 
 
     def _to_domain(self, model: ExerciseModel) -> Exercise:
         return Exercise(
             name=model.name,
-            muscle_group=model.muscle_group,
+            muscle_group=MuscleGroup(model.muscle_group),  
             id=model.id,
-            description=model.description
-        )
-    
-
-    def _to_model(self, model: Exercise) -> ExerciseModel:
-        return ExerciseModel(
-            id=model.id,
-            name=model.name,
-            muscle_group=model.muscle_group,
-            description=model.description
+            description=model.description,
         )

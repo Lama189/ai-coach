@@ -40,7 +40,7 @@ class PostgresUserRepository(IUserRepository):
         await self._session.flush()
 
 
-    async def get_by_id(self, user_id: UUID):
+    async def get_by_id(self, user_id: UUID) -> User | None:
         stmt = (
             select(UserModel)
             .options(

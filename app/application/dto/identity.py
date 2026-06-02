@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, UUID4, Field, ConfigDict
 
@@ -33,9 +34,20 @@ class UserCreateDTO(BaseModel):
     profile: UserProfileCreateDTO
 
 
+class UserProfileResponseDTO(BaseModel):
+    gender: UserGender
+    age: int
+    height_cm: int
+    weight_kg: float
+    goal: FitnessGoal
+    experience_level: ExperienceLevel
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class UserResponseDTO(BaseModel):
     id: UUID4
     username: str
-    created_at: datetime
+    profile: Optional[UserProfileResponseDTO] = None
 
     model_config = ConfigDict(from_attributes=True)

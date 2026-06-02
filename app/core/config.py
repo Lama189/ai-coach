@@ -4,6 +4,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     database_url: str = ""
+    llm_api_key: str = "" 
 
     model_config = SettingsConfigDict(
         env_file=".env",
