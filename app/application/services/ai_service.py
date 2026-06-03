@@ -205,8 +205,13 @@ class AIService:
         domain_program = self._map_to_domain(user_id, program)
 
         await self._uow.programs.save(domain_program)
-        await self._uow.commit()
+        for day in domain_program.workout_days:
+            await self._uow.workout_days.save(day, domain_program.id)
 
+            for ex in day.exercises:
+                await self._uow.workout_days_exercise.save(ex, day.id)
+
+        await self._uow.commit()
         return self._map_to_response(domain_program)
 
 

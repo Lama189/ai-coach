@@ -1,6 +1,6 @@
 from uuid import UUID
 from datetime import datetime
-from sqlalchemy import select, exists, update, func
+from sqlalchemy import select, update, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.program import WorkoutProgram
@@ -25,6 +25,18 @@ class PostgresWorkoutProgramRepository(IWorkoutProgramRepository):
             existing.description = str(program.description)
             existing.is_active = program.is_active
             existing.updated_at = func.now()
+
+
+    async def get_actual_by_user_id(self, user_id: UUID) -> WorkoutProgram | None:
+        stmt = (
+            select(WorkoutProgramModel)
+            .where(and_(
+                WorkoutProgramModel.user_id == user_id,
+                WorkoutProgramModel.is_active == True
+            ))
+        )
+        model = (await self._session.execute(stmt)).scalar_one_or_none()
+        return self._to_domain(model) if model else None
 
     
     def _to_domain(self, model: WorkoutProgramModel) -> WorkoutProgram:

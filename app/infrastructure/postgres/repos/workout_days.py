@@ -1,4 +1,5 @@
 from uuid import UUID
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.workout_day import WorkoutDay
@@ -23,6 +24,17 @@ class PostgresWorkoutDayRepository(IWorkoutDayRepository):
             existing.title = workout_day.title
 
         await self._session.flush()
+
+
+    async def get_by_program_id(self, program_id: UUID) -> list[WorkoutDay]:
+        stmt = select(WorkoutDayModel).where(WorkoutDayModel.program_id == program_id)
+        
+        models = (await self._session.execute(stmt)).scalars().all()
+        if models is None:
+            return []
+
+        return [self._to_domain(model) for model in models]
+
 
 
     def _to_domain(self, model: WorkoutDayModel) -> WorkoutDay:

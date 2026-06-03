@@ -56,3 +56,24 @@ class WorkoutProgramService:
         await self._uow.commit()
         return program
 
+
+    async def get_actual_program_for_user(self, user_id: UUID) -> WorkoutProgram:
+        existing_program = await self._uow.programs.get_actual_by_user_id(user_id)
+        if existing_program is None:
+            raise ValueError("Для данного пользователя нет программ тренировок")
+        
+        days = await self._uow.workout_days.get_by_program_id(existing_program.id)
+        if not days:
+            raise ValueError("Для данной программы отсутствуют тренировочные дни")
+
+        for day in days:
+            existing_program.add_day(day)
+
+            exercises = await self._uow.workout_days_exercise.get_by_workout_day_id(day.id)
+            if not exercises:
+                continue
+            
+            for ex in exercises:
+                day.add_exercise(ex)
+
+        return existing_program

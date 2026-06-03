@@ -1,4 +1,5 @@
 from uuid import UUID
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.workout_day_exercise import WorkoutDayExercise
@@ -25,6 +26,20 @@ class PostgresWorkoutDayExerciseRepository(IWorkoutDayExerciseRepository):
 
         await self._session.flush()
 
+
+    async def get_by_workout_day_id(self, workout_day_id: UUID) -> list[WorkoutDayExercise]:
+        stmt = (
+            select(WorkoutDayExerciseModel).
+            where(WorkoutDayExerciseModel.workout_day_id==workout_day_id)
+        )
+        
+        models = (await self._session.execute(stmt)).scalars().all()
+        if models is None:
+            return []
+
+        return [self._to_domain(model) for model in models]
+
+
     def _to_domain(self, model: WorkoutDayExerciseModel) -> WorkoutDayExercise:
         return WorkoutDayExercise(
             id=model.id,
@@ -33,6 +48,7 @@ class PostgresWorkoutDayExerciseRepository(IWorkoutDayExerciseRepository):
             reps=model.reps,
             rest_seconds=model.rest_seconds
         )
+
 
     def _to_model(self, domain: WorkoutDayExercise, workout_day_id: UUID) -> WorkoutDayExerciseModel:
         return WorkoutDayExerciseModel(

@@ -11,3 +11,6 @@ class IWorkoutDayExerciseRepository(ABC):
         ...
 
     
+    @abstractmethod
+    async def get_by_workout_day_id(self, workout_day_id: UUID) -> list[WorkoutDayExercise]:
+        ...

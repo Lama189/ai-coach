@@ -53,3 +53,5 @@ class WorkoutProgramResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
