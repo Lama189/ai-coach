@@ -3,7 +3,8 @@ import logging
 import app.infrastructure.postgres.models
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from sqlalchemy import text
+
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.v1.routes.users import router as users_router
 from app.api.v1.routes.exercises import router as exercises_router
@@ -26,6 +27,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+Instrumentator().instrument(app).expose(app)
 
 @app.get("/")
 async def root():

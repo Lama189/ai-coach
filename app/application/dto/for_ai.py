@@ -17,21 +17,19 @@ class CreateExercisesBatchInput(BaseModel):
 
 
 class WorkoutDayExerciseAI(BaseModel):
-    exercise_id: UUID
-    sets: int
-    reps: int
-    rest_seconds: int | None = None
-
+    exercise_id: UUID = Field(..., description="UUID упражнения из базы данных")
+    sets: int = Field(..., description="Количество подходов")
+    reps: int = Field(..., description="Количество повторений")
+    rest_seconds: int = Field(..., description="Время отдыха в секундах")
 
 class WorkoutDayAI(BaseModel):
-    day_number: int
-    title: str
+    day_number: int = Field(..., description="Порядковый номер дня, начиная с 1")
+    title: str = Field(..., description="Название дня, например 'Legs and Back'")
     exercises: list[WorkoutDayExerciseAI]
 
-
 class WorkoutProgramAI(BaseModel):
-    name: str
-    description: str | None = None
+    name: str = Field(..., description="Название программы")
+    description: str = Field(..., description="Описание программы")
     workout_days: list[WorkoutDayAI]
 
 

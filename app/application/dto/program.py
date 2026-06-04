@@ -1,5 +1,6 @@
 from uuid import UUID
 from pydantic import BaseModel, Field
+from typing import Literal
 
 
 class WorkoutDayExerciseCreate(BaseModel):
@@ -55,3 +56,10 @@ class WorkoutProgramResponse(BaseModel):
         from_attributes = True
 
 
+class GenerateProgram(BaseModel):
+    user_id: UUID
+    content: str | None = Field(..., description="Пожелания пользователя к программе")
+    importance: Literal["low", "medium", "high"] = Field(
+        default="medium", 
+        description="Насколько строго учитывать пожелания"
+    )

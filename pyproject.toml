@@ -17,6 +17,7 @@ dependencies = [
     "openai>=2.38.0",
     "passlib[bcrypt]>=1.7.4",
     "pgvector>=0.4.2",
+    "prometheus-fastapi-instrumentator>=8.0.0",
     "psycopg>=3.3.4",
     "pydantic-settings>=2.14.1",
     "sentence-transformers>=5.5.1",

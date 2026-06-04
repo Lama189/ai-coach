@@ -1,14 +1,22 @@
+import time
 import logging
 from typing import Annotated, TypedDict
 from uuid import UUID
 
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import (
+    AIMessage, 
+    BaseMessage, 
+    HumanMessage, 
+    SystemMessage, 
+    ToolMessage
+)
 from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 
+from app.core.metrics import llm_requests_total, llm_tokens_used, llm_request_duration
 from app.application.dto.for_ai import (
     SearchExercisesBatchInput,
     CreateExercisesBatchInput,
@@ -19,6 +27,7 @@ from app.application.dto.program import (
     WorkoutProgramResponse,
     WorkoutDayResponse,
     WorkoutDayExerciseResponse,
+    GenerateProgram
 )
 from app.domain.enums import MuscleGroup
 from app.domain.training.exercise import Exercise
@@ -49,12 +58,12 @@ class AIService:
         )
         self._tools = self._build_tools()
         self._llm_with_tools = self._llm.bind_tools(self._tools)
-        self._structured_llm = self._llm.with_structured_output(WorkoutProgramAI)
+        self._structured_llm = self._llm.with_structured_output(WorkoutProgramAI, method="json_mode")
         self._graph = self._build_graph()
 
 
-    async def _build_prompt(self, user_id: UUID) -> str:
-        user = await self._uow.users.get_by_id(user_id)
+    async def _build_prompt(self, dto: GenerateProgram) -> str:
+        user = await self._uow.users.get_by_id(dto.user_id)
         if user is None:
             raise ValueError("Пользователь не найден")
 
@@ -62,7 +71,7 @@ class AIService:
         if profile is None:
             raise ValueError("Профиль пользователя отсутствует")
 
-        return f"""
+        prompt = f"""
                 Ты элитный персональный фитнес-тренер.
 
                 Профиль клиента:
@@ -90,9 +99,44 @@ class AIService:
                 - Без множественного числа: "Pull Up" не "Pull Ups", "Squat" не "Squats"
                 - Без лишних слов: "Bench Press" не "Barbell Flat Bench Press"
 
+                Название дня должно отражать группы мышц: "Legs and Back", "Chest and Triceps", не "Day 1"
+
+                Количество тренировочных дней в неделю:
+                - beginner:     3 дня
+                - intermediate: 3-4 дня  
+                - advanced:     4-5 дней
+
+                Правила составления программы:
+                - beginner:     3-4 упражнения в день
+                - intermediate: 4-5 упражнений в день
+                - advanced:     5-6 упражнений в день
+                - Минимум упражнений в день — 3, исключений нет
+
+                Если пользователь указал на боль или дискомфорт в суставе/мышце —
+                ИСКЛЮЧИ упражнения на эту группу полностью.
+                Боль — это не "меньше нагрузки", это "не трогать вообще".
+
+                Не повторяй одинаковые упражнения в разные дни одной недели.
+                Каждое упражнение должно встречаться максимум один раз в программе.
+
                 Допустимые значения muscle_group (строго lowercase):
                 chest, back, legs, shoulders, biceps, triceps, core, full_body, cardio
                 """
+        
+        if dto.content:
+            importance_map = {
+                "low": "Прими во внимание, но не обязательно строго следуй",
+                "medium": "Старайся учитывать при составлении программы",
+                "high": "Обязательно учти, это приоритет при составлении",
+            }
+            instruction = importance_map.get(dto.importance, importance_map["medium"])
+
+            prompt += f"""
+                        Пожелания клиента ({instruction}):
+                        {dto.content}   
+                        """
+        return prompt
+    
 
     def _build_tools(self):
         @tool(args_schema=SearchExercisesBatchInput, description="Найти несколько упражнений в базе данных за один вызов.")
@@ -139,13 +183,91 @@ class AIService:
 
 
     async def _agent_node(self, state: AgentState) -> dict:
-        response = await self._llm_with_tools.ainvoke(state["messages"])
-        return {"messages": [response]}
+        start = time.time()
+
+        try:
+            response = await self._llm_with_tools.ainvoke(state["messages"])
+
+            if hasattr(response, "usage_metadata") and response.usage_metadata:
+                input_tokens = response.usage_metadata.get("input_tokens", 0)
+                output_tokens = response.usage_metadata.get("output_tokens", 0)
+                llm_tokens_used.labels(node="agent").inc(input_tokens + output_tokens)
+                logger.debug(f"[agent_node] input={input_tokens} output={output_tokens}")
+
+            llm_requests_total.labels(node="agent", status="success").inc()
+            return {"messages": [response]}
+        
+        except Exception as e:
+            llm_requests_total.labels(node="agent", status="error").inc()
+            raise
+
+        finally:
+            llm_request_duration.labels(node="agent").observe(time.time() - start)
 
 
     async def _generate_node(self, state: AgentState) -> dict:
-        program = await self._structured_llm.ainvoke(state["messages"])
-        return {"program": program}
+        start = time.time()
+
+        try:
+            system_msg = state["messages"][0]
+            raw_results = "\n".join(
+                msg.content if isinstance(msg.content, str) else str(msg.content)
+                for msg in state["messages"]
+                if isinstance(msg, ToolMessage) and msg.content
+            )
+
+            clean_messages = [
+                system_msg,
+                HumanMessage(content=(
+                    f"Доступные упражнения для программы:\n"
+                    f"{raw_results}\n\n"
+                    "Правила финальной генерации:\n"
+                    "1. Используй ТОЛЬКО UUID из списка выше в поле exercise_id\n"
+                    "2. Каждый день минимум 4-5 упражнений (для advanced)\n"
+                    "3. rest_seconds обязателен:\n"
+                    "   - lose_weight: 30-45 сек\n"
+                    "   - gain_muscle: 60-90 сек\n"
+                    "   - endurance: 20-30 сек\n"
+                    "   - maintenance: 45-60 сек\n"
+                    "4. Строго следуй пожеланиям клиента из системного промпта\n"
+                    "5. Не повторяй одинаковые упражнения в разные дни\n\n"
+                    "Верни ответ строго в формате JSON со следующей структурой:\n"
+                    "{\n"
+                    '  "name": "название программы",\n'
+                    '  "description": "описание программы",\n'
+                    '  "workout_days": [\n'
+                    "    {\n"
+                    '      "day_number": 1,\n'
+                    '      "title": "Legs and Back",\n'
+                    '      "exercises": [\n'
+                    "        {\n"
+                    '          "exercise_id": "uuid-из-списка-выше",\n'
+                    '          "sets": 4,\n'
+                    '          "reps": 8,\n'
+                    '          "rest_seconds": 90\n'
+                    "        }\n"
+                    "      ]\n"
+                    "    }\n"
+                    "  ]\n"
+                    "}"
+                )),
+            ]
+
+            program = await self._structured_llm.ainvoke(clean_messages)
+
+            estimated_tokens = sum(len(str(m.content)) for m in clean_messages) // 4
+            llm_tokens_used.labels(node="generate").inc(estimated_tokens)
+            logger.debug(f"[generate_node] estimated_tokens={estimated_tokens}")
+
+            llm_requests_total.labels(node="generate", status="success").inc()
+            return {"program": program}
+        
+        except Exception as e:
+            llm_requests_total.labels(node="generate", status="error").inc()
+            raise
+
+        finally:
+            llm_request_duration.labels(node="generate").observe(time.time() - start)
 
 
     def _should_continue(self, state: AgentState) -> str:
@@ -179,8 +301,8 @@ class AIService:
         return graph.compile()
 
 
-    async def generate_workout(self, user_id: UUID) -> WorkoutProgramResponse:
-        system_prompt = await self._build_prompt(user_id)
+    async def generate_workout(self, dto: GenerateProgram) -> WorkoutProgramResponse:
+        system_prompt = await self._build_prompt(dto)
 
         initial_state: AgentState = {
             "messages": [
@@ -192,7 +314,7 @@ class AIService:
                     "Затем составь программу используя реальные UUID."
                 )),
             ],
-            "user_id": user_id,
+            "user_id": dto.user_id,
             "program": None,
         }
 
@@ -202,7 +324,7 @@ class AIService:
         if program is None:
             raise ValueError("Модель не вернула программу")
 
-        domain_program = self._map_to_domain(user_id, program)
+        domain_program = self._map_to_domain(dto.user_id, program)
 
         await self._uow.programs.save(domain_program)
         for day in domain_program.workout_days:

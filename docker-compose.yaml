@@ -16,6 +16,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app_network
 
   migrations:
     build:
@@ -31,6 +33,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy  
+    networks:
+      - app_network
 
   web:
     build:
@@ -41,12 +45,44 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-      - /app/.venv  
+      - venv_data:/app/.venv
     environment:
       - DATABASE_URL=postgresql+asyncpg://${COACH_DB_USER:-postgres}:${COACH_DB_PASSWORD:-123}@postgres:5432/${COACH_DB_NAME:-ai_coach}
     depends_on:
       migrations:
         condition: service_completed_successfully 
+    networks:
+      - app_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - app_network
+    
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - app_network
 
 volumes:
   pg_data:
+  prometheus_data:
+  grafana_data:
+  venv_data:
+
+networks:
+  app_network:
+    driver: bridge

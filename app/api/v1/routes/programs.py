@@ -12,7 +12,7 @@ from app.api.v1.dependencies import (
 )
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
-from app.application.dto.program import WorkoutProgramCreate, WorkoutProgramResponse
+from app.application.dto.program import WorkoutProgramCreate, WorkoutProgramResponse, GenerateProgram
 
 
 router = APIRouter(prefix="/api/v1/programs", tags=["programs"])
@@ -36,19 +36,19 @@ async def create_workout_program(dto: WorkoutProgramCreate, uow: IUnitOfWork = D
     
 
 @router.post(
-    path="/generate/{user_id}",
+    path="/generate",
     response_model=WorkoutProgramResponse,
     status_code=status.HTTP_201_CREATED
 )
 async def generate_workout_program(
-    user_id: UUID, 
+    dto: GenerateProgram, 
     uow: IUnitOfWork = Depends(get_uow),
     embedder: SentenceTransformerEmbeddingService = Depends(get_embedding_service),
     api_key: str = Depends(get_llm_api_key)
 ):
     service = AIService(uow, embedder, api_key)
     try:
-        return await service.generate_workout(user_id)
+        return await service.generate_workout(dto)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
