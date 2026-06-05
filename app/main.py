@@ -10,7 +10,7 @@ from app.api.v1.routes.users import router as users_router
 from app.api.v1.routes.exercises import router as exercises_router
 from app.api.v1.routes.programs import router as programs_router
 
-from app.api.v1.dependencies import get_embedding_service
+from app.application.dependencies import get_embedding_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

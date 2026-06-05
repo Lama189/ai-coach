@@ -1,18 +1,24 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
 from app.application.services.ai_service import AIService
 from app.application.services.program_service import WorkoutProgramService
 
-from app.api.v1.dependencies import (
+from app.application.dependencies import (
     get_uow, 
     get_llm_api_key, 
     get_embedding_service
 )
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
-from app.application.dto.program import WorkoutProgramCreate, WorkoutProgramResponse, GenerateProgram
+from app.application.dto.program import (
+    WorkoutProgramCreate, 
+    WorkoutProgramResponse, 
+    GenerateProgram, 
+    TaskAcceptedResponse
+)
+from app.application.workers.tasks import generate_workout_task
 
 
 router = APIRouter(prefix="/api/v1/programs", tags=["programs"])
@@ -37,22 +43,33 @@ async def create_workout_program(dto: WorkoutProgramCreate, uow: IUnitOfWork = D
 
 @router.post(
     path="/generate",
-    response_model=WorkoutProgramResponse,
-    status_code=status.HTTP_201_CREATED
+    response_model=TaskAcceptedResponse,
+    status_code=status.HTTP_202_ACCEPTED
 )
 async def generate_workout_program(
     dto: GenerateProgram, 
-    uow: IUnitOfWork = Depends(get_uow),
-    embedder: SentenceTransformerEmbeddingService = Depends(get_embedding_service),
-    api_key: str = Depends(get_llm_api_key)
 ):
-    service = AIService(uow, embedder, api_key)
     try:
-        return await service.generate_workout(dto)
-    except ValueError as e:
+        task_id = str(uuid4())
+        task_payload = dto.model_dump()
+
+        generate_workout_task.apply_async(
+            kwargs={
+                "dto_dict": task_payload, 
+                "task_id": task_id  
+            },
+            task_id=task_id 
+        )
+
+        return TaskAcceptedResponse(
+            task_id=task_id, 
+            status="processing"
+        )
+    
+    except Exception as e:  
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to queue task: {str(e)}"
         )
     
 

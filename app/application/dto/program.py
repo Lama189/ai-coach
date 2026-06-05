@@ -63,3 +63,9 @@ class GenerateProgram(BaseModel):
         default="medium", 
         description="Насколько строго учитывать пожелания"
     )
+
+
+class TaskAcceptedResponse(BaseModel):
+    task_id: UUID = Field(..., description="Уникальный идентификатор задачи")
+    status: str = Field(..., description="Текущий статус фоновой задачи (processing, completed, failed)")
+    message: str = Field(default="Генерация программы успешно запущена")

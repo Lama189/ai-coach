@@ -1,6 +1,6 @@
 import time
 import logging
-from typing import Annotated, TypedDict
+from typing import Annotated, TypedDict, Callable, AsyncContextManager
 from uuid import UUID
 
 from langchain_core.messages import (
@@ -48,8 +48,12 @@ class AgentState(TypedDict):
 
 
 class AIService:
-    def __init__(self, uow: IUnitOfWork, embedder: SentenceTransformerEmbeddingService, api_key: str):
-        self._uow = uow
+    def __init__(self, 
+        uow_factory: Callable[[], AsyncContextManager[IUnitOfWork]],
+        embedder: SentenceTransformerEmbeddingService, 
+        api_key: str
+    ):
+        self._uow_factory = uow_factory
         self._embedder = embedder
         self._llm = ChatGroq(
             api_key=api_key,
@@ -57,31 +61,38 @@ class AIService:
             temperature=0.3,
         )
         self._tools = self._build_tools()
-        self._llm_with_tools = self._llm.bind_tools(self._tools)
-        self._structured_llm = self._llm.with_structured_output(WorkoutProgramAI, method="json_mode")
         self._graph = self._build_graph()
 
 
     async def _build_prompt(self, dto: GenerateProgram) -> str:
-        user = await self._uow.users.get_by_id(dto.user_id)
-        if user is None:
-            raise ValueError("Пользователь не найден")
+        async with self._uow_factory() as uow:
+            user = await uow.users.get_by_id(dto.user_id)
+            if user is None:
+                raise ValueError("Пользователь не найден")
 
-        profile = user.profile
-        if profile is None:
-            raise ValueError("Профиль пользователя отсутствует")
+            profile = user.profile
+            if profile is None:
+                raise ValueError("Профиль пользователя отсутствует")
+
+            username = user.username
+            gender_val = profile.gender.value
+            age = profile.age
+            height = profile.height_cm
+            weight = profile.weight_kg
+            goal_val = profile.goal.value
+            exp_val = profile.experience_level.value
 
         prompt = f"""
                 Ты элитный персональный фитнес-тренер.
 
                 Профиль клиента:
-                Имя: {user.username}
-                Пол: {profile.gender.value}
-                Возраст: {profile.age}
-                Рост: {profile.height_cm}
-                Вес: {profile.weight_kg}
-                Цель: {profile.goal.value}
-                Уровень подготовки: {profile.experience_level.value}
+                Имя: {username}
+                Пол: {gender_val}
+                Возраст: {age}
+                Рост: {height}
+                Вес: {weight}
+                Цель: {goal_val}
+                Уровень подготовки: {exp_val}
 
                 Правила работы:
                 1. Используй только упражнения, полученные из инструментов.
@@ -143,40 +154,42 @@ class AIService:
         async def search_exercises_batch(queries: list[str]) -> str:
             lines = []
 
-            for query in queries:
-                exercises = await self._uow.exercises.search(query=query, limit=5)
-                if not exercises:
-                    lines.append(f"[{query}] не найдено")
-                    continue
-                for e in exercises:
-                    lines.append(f"[{query}] id={e.id} | name={e.name} | muscle_group={e.muscle_group.value}")
+            async with self._uow_factory() as uow:
+                for query in queries:
+                    exercises = await uow.exercises.search(query=query, limit=5)
+                    if not exercises:
+                        lines.append(f"[{query}] не найдено")
+                        continue
+                    for e in exercises:
+                        lines.append(f"[{query}] id={e.id} | name={e.name} | muscle_group={e.muscle_group.value}")
             return "\n".join(lines) if lines else "Ничего не найдено"
 
         @tool(args_schema=CreateExercisesBatchInput, description="Создать несколько упражнений за один вызов. UUID генерируются автоматически.")
         async def create_exercises_batch(exercises: list[CreateExerciseInput]) -> str:
             results = []
 
-            for ex in exercises:
-                existing = await self._uow.exercises.get_by_name(ex.name)
-                if existing:
-                    results.append(f"id={existing.id} | name={existing.name}")
-                    continue
+            async with self._uow_factory() as uow:
+                for ex in exercises:
+                    existing = await uow.exercises.get_by_name(ex.name)
+                    if existing:
+                        results.append(f"id={existing.id} | name={existing.name}")
+                        continue
 
-                embedding = await self._embedder.get_embedding(f"{ex.name} {ex.muscle_group}")
-                similar = await self._uow.exercises.find_familiar(embedding)
-                if similar:
-                    results.append(f"id={similar.id} | name={similar.name}")
-                    continue
+                    embedding = await self._embedder.get_embedding(f"{ex.name} {ex.muscle_group}")
+                    similar = await uow.exercises.find_familiar(embedding)
+                    if similar:
+                        results.append(f"id={similar.id} | name={similar.name}")
+                        continue
 
-                exercise = Exercise(
-                    name=ex.name,
-                    muscle_group=MuscleGroup(ex.muscle_group.lower()),
-                    description=ex.description,
-                )
-                await self._uow.exercises.save_exercise(exercise, embedding)
-                results.append(f"id={exercise.id} | name={exercise.name}")
+                    exercise = Exercise(
+                        name=ex.name,
+                        muscle_group=MuscleGroup(ex.muscle_group.lower()),
+                        description=ex.description,
+                    )
+                    await uow.exercises.save_exercise(exercise, embedding)
+                    results.append(f"id={exercise.id} | name={exercise.name}")
 
-            await self._uow.commit()
+                await uow.commit()
             return "\n".join(results)
 
         return [search_exercises_batch, create_exercises_batch]
@@ -184,9 +197,9 @@ class AIService:
 
     async def _agent_node(self, state: AgentState) -> dict:
         start = time.time()
-
+        llm_with_tools = self._llm.bind_tools(self._tools)
         try:
-            response = await self._llm_with_tools.ainvoke(state["messages"])
+            response = await llm_with_tools.ainvoke(state["messages"])
 
             if hasattr(response, "usage_metadata") and response.usage_metadata:
                 input_tokens = response.usage_metadata.get("input_tokens", 0)
@@ -200,14 +213,13 @@ class AIService:
         except Exception as e:
             llm_requests_total.labels(node="agent", status="error").inc()
             raise
-
         finally:
             llm_request_duration.labels(node="agent").observe(time.time() - start)
 
 
     async def _generate_node(self, state: AgentState) -> dict:
         start = time.time()
-
+        structured_llm = self._llm.with_structured_output(WorkoutProgramAI, method="json_mode")
         try:
             system_msg = state["messages"][0]
             raw_results = "\n".join(
@@ -253,7 +265,7 @@ class AIService:
                 )),
             ]
 
-            program = await self._structured_llm.ainvoke(clean_messages)
+            program = await structured_llm.ainvoke(clean_messages)
 
             estimated_tokens = sum(len(str(m.content)) for m in clean_messages) // 4
             llm_tokens_used.labels(node="generate").inc(estimated_tokens)
@@ -265,7 +277,6 @@ class AIService:
         except Exception as e:
             llm_requests_total.labels(node="generate", status="error").inc()
             raise
-
         finally:
             llm_request_duration.labels(node="generate").observe(time.time() - start)
 
@@ -277,13 +288,30 @@ class AIService:
         return "generate"
 
 
-    def _build_graph(self):
-        tool_node = ToolNode(self._tools)
+    async def _sequential_tool_node(self, state: AgentState) -> dict:
+        last_message = state["messages"][-1]
+        
+    
+        if not isinstance(last_message, AIMessage) or not last_message.tool_calls:
+            logger.warning(f"[_sequential_tool_node] Получено сообщение без tool_calls: {type(last_message)}")
+            return {"messages": []}
 
+        outputs = []
+        tools_map = {tool.name: tool for tool in self._tools}
+        
+        for tool_call in last_message.tool_calls:
+            tool_obj = tools_map[tool_call["name"]]
+            tool_output = await tool_obj.ainvoke(tool_call)
+            outputs.append(tool_output)
+            
+        return {"messages": outputs}
+
+
+    def _build_graph(self):
         graph = StateGraph(AgentState)
 
         graph.add_node("agent", self._agent_node)
-        graph.add_node("tools", tool_node)
+        graph.add_node("tools", self._sequential_tool_node)  
         graph.add_node("generate", self._generate_node)
 
         graph.add_edge(START, "agent")
@@ -301,7 +329,7 @@ class AIService:
         return graph.compile()
 
 
-    async def generate_workout(self, dto: GenerateProgram) -> WorkoutProgramResponse:
+    async def generate_workout(self, dto: GenerateProgram, task_id: UUID | None = None) -> WorkoutProgramResponse:
         system_prompt = await self._build_prompt(dto)
 
         initial_state: AgentState = {
@@ -326,14 +354,18 @@ class AIService:
 
         domain_program = self._map_to_domain(dto.user_id, program)
 
-        await self._uow.programs.save(domain_program)
-        for day in domain_program.workout_days:
-            await self._uow.workout_days.save(day, domain_program.id)
+        async with self._uow_factory() as uow:
+            await uow.programs.deactivate_all_for_user(dto.user_id)
+            await uow.programs.save(domain_program, task_id)
+            
+            for day in domain_program.workout_days:
+                await uow.workout_days.save(day, domain_program.id)
 
-            for ex in day.exercises:
-                await self._uow.workout_days_exercise.save(ex, day.id)
+                for ex in day.exercises:
+                    await uow.workout_days_exercise.save(ex, day.id)
 
-        await self._uow.commit()
+            await uow.commit()
+            
         return self._map_to_response(domain_program)
 
 

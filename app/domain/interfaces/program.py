@@ -7,11 +7,15 @@ from app.domain.training.program import WorkoutProgram
 class IWorkoutProgramRepository(ABC):
 
     @abstractmethod
-    async def save(self, program: WorkoutProgram) -> None:
+    async def save(self, program: WorkoutProgram, task_id: UUID | None = None) -> None:
         ...
 
     @abstractmethod
     async def get_actual_by_user_id(self, user_id: UUID) -> WorkoutProgram | None:
+        ...
+
+    @abstractmethod
+    async def get_by_task_id(self, task_id: UUID) -> WorkoutProgram | None:
         ...
 
     @abstractmethod

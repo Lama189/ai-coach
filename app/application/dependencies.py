@@ -14,7 +14,7 @@ async def get_uow() -> AsyncGenerator[IUnitOfWork, None]:
         yield uow
 
 
-async def get_llm_api_key() -> str:
+def get_llm_api_key() -> str:
     return settings.llm_api_key
 
 

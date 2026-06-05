@@ -13,11 +13,11 @@ class PostgresWorkoutProgramRepository(IWorkoutProgramRepository):
         self._session = session
 
     
-    async def save(self, program: WorkoutProgram) -> None:
+    async def save(self, program: WorkoutProgram, task_id: UUID | None = None) -> None:
         existing = await self._session.get(WorkoutProgramModel, program.id)
 
         if existing is None:
-            model = self._to_model(program)
+            model = self._to_model(program, task_id)
             self._session.add(model)
         else:
             existing.user_id = program.user_id
@@ -25,6 +25,9 @@ class PostgresWorkoutProgramRepository(IWorkoutProgramRepository):
             existing.description = str(program.description)
             existing.is_active = program.is_active
             existing.updated_at = func.now()
+
+            if task_id is not None:
+                existing.task_id = task_id
 
 
     async def get_actual_by_user_id(self, user_id: UUID) -> WorkoutProgram | None:
@@ -49,6 +52,15 @@ class PostgresWorkoutProgramRepository(IWorkoutProgramRepository):
         )
     
 
+    async def get_by_task_id(self, task_id: UUID) -> WorkoutProgram | None:
+        stmt = (
+            select(WorkoutProgramModel)
+            .where(WorkoutProgramModel.task_id == task_id)
+        )
+        model = (await self._session.execute(stmt)).scalar_one_or_none()
+        return self._to_domain(model) if model else None
+    
+
     async def deactivate_all_for_user(self, user_id: UUID) -> None:
         stmt = (
             update(WorkoutProgramModel)
@@ -65,10 +77,11 @@ class PostgresWorkoutProgramRepository(IWorkoutProgramRepository):
         await self._session.execute(stmt)
     
 
-    def _to_model(self, model: WorkoutProgram) -> WorkoutProgramModel:
+    def _to_model(self, model: WorkoutProgram, task_id: UUID | None = None) -> WorkoutProgramModel:
         return WorkoutProgramModel(
             id=model.id,
             user_id=model.user_id,
+            task_id=task_id,
             name=model.name,
             description=model.description,
             is_active=model.is_active
