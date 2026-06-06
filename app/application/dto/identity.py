@@ -31,6 +31,7 @@ class UserProfileCreateDTO(BaseModel):
 class UserCreateDTO(BaseModel):
     username: str = Field(min_length=3, max_length=40)
     password: str = Field(min_length=8)
+    telegram_id: int | None = None
     profile: UserProfileCreateDTO
 
 
@@ -48,6 +49,7 @@ class UserProfileResponseDTO(BaseModel):
 class UserResponseDTO(BaseModel):
     id: UUID4
     username: str
-    profile: Optional[UserProfileResponseDTO] = None
+    telegram_id: int | None = None
+    profile: UserProfileResponseDTO | None = None
 
     model_config = ConfigDict(from_attributes=True)

@@ -23,6 +23,7 @@ class PostgresUserRepository(IUserRepository):
             self._session.add(model)
         else:
             existing.username = user.username
+            existing.telegram_id = user.telegram_id
             existing.password_hash = user.password_hash
             existing.updated_at = user.updated_at
             
@@ -51,9 +52,22 @@ class PostgresUserRepository(IUserRepository):
             .where(UserModel.id == user_id)
         )
 
-        result = await self._session.execute(stmt)
-        model = result.scalar_one_or_none()
+        model = (await self._session.execute(stmt)).scalar_one_or_none()
+        return self._to_domain(model) if model else None
+    
 
+    async def get_by_telegram_id(self, telegram_id: int) -> User | None:
+        stmt = (
+            select(UserModel)
+            .options(
+                selectinload(UserModel.profile),
+                selectinload(UserModel.sessions),
+                selectinload(UserModel.workout_programs),
+            )
+            .where(UserModel.telegram_id == telegram_id)
+        )
+
+        model = (await self._session.execute(stmt)).scalar_one_or_none()
         return self._to_domain(model) if model else None
     
 
@@ -94,6 +108,7 @@ class PostgresUserRepository(IUserRepository):
         return User(
             id=model.id,
             username=model.username,
+            telegram_id=model.telegram_id,
             password_hash=model.password_hash,
             profile=profile,
             created_at=model.created_at,
@@ -105,6 +120,7 @@ class PostgresUserRepository(IUserRepository):
         model = UserModel(
             id=user.id,
             username=user.username,
+            telegram_id=user.telegram_id,
             password_hash=user.password_hash,
             created_at=user.created_at,
             updated_at=user.updated_at,

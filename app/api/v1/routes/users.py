@@ -43,3 +43,17 @@ async def get_user(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)):
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="User not found")
     
     return UserResponseDTO.model_validate(user)
+
+
+@router.get(
+    path="/telegram/{telegram_id}",
+    response_model=UserResponseDTO,
+    status_code=HTTP_200_OK
+)
+async def get_user_by_telegram_id(telegram_id: int, uow: IUnitOfWork = Depends(get_uow)):
+    service = UserService(uow)
+    user = await service.get_user_by_telegram_id(telegram_id)
+    if not user:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="User not found")
+    
+    return UserResponseDTO.model_validate(user)

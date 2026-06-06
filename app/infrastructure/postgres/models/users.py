@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
-from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy import (
     String,
+    BigInteger,
     DateTime,
     func
 )
@@ -20,7 +20,8 @@ if TYPE_CHECKING:
 class User(BaseModel):
     __tablename__ = "users"
 
-    id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid4) # ИСПРАВЛЕНО: без ()
+    id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid4)
+    telegram_id: Mapped[int | None] = mapped_column(BigInteger, unique=True, nullable=True, index=True)
     username: Mapped[str] = mapped_column(String(50), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 

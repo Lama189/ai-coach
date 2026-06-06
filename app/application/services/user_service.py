@@ -25,6 +25,10 @@ class UserService:
         return await self._uow.users.get_by_id(user_id)
     
     
+    async def get_user_by_telegram_id(self, telegram_id: int) -> User | None:
+        return await self._uow.users.get_by_telegram_id(telegram_id)
+    
+    
     async def update_weight(self, user_id: UUID, new_weight: float) -> User:
         user = await self._uow.users.get_by_id(user_id)
         if not user or not user.profile:

@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
-from typing import Optional
 
 from app.domain.identity.user_profile import UserProfile
 
@@ -11,7 +10,8 @@ class User:
     username: str
     password_hash: str
     id: UUID = field(default_factory=uuid4)
-    profile: Optional[UserProfile] = None
+    telegram_id: int | None = None
+    profile: UserProfile | None = None
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 

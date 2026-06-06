@@ -116,6 +116,25 @@ services:
     networks:
       - app_network
 
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitness_bot
+    command: python bot/main.py
+    restart: always
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+    volumes:
+      - .:/app
+      - venv_data:/app/.venv
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - app_network
+
+
 volumes:
   pg_data:
   prometheus_data:

@@ -27,7 +27,9 @@ router = APIRouter(prefix="/api/v1/programs", tags=["programs"])
 @router.post(
     path="/",
     response_model=WorkoutProgramResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    summary="Создать программу тренировок вручную",
+    description="Создаёт программу тренировок из готовых данных без участия AI."
 )
 async def create_workout_program(dto: WorkoutProgramCreate, uow: IUnitOfWork = Depends(get_uow)):
     service = WorkoutProgramService(uow)
@@ -44,7 +46,18 @@ async def create_workout_program(dto: WorkoutProgramCreate, uow: IUnitOfWork = D
 @router.post(
     path="/generate",
     response_model=TaskAcceptedResponse,
-    status_code=status.HTTP_202_ACCEPTED
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Сгенерировать персональную программу через AI",
+    description="""
+            Запускает асинхронную генерацию персональной программы тренировок через AI-агента.
+
+            Агент:
+            1. Ищет подходящие упражнения в базе данных
+            2. Создаёт недостающие упражнения если нужно
+            3. Составляет программу с учётом профиля и пожеланий пользователя
+
+            Возвращает `task_id` — используй его для отслеживания статуса задачи.
+                """,
 )
 async def generate_workout_program(
     dto: GenerateProgram, 
@@ -61,10 +74,7 @@ async def generate_workout_program(
             task_id=task_id 
         )
 
-        return TaskAcceptedResponse(
-            task_id=task_id, 
-            status="processing"
-        )
+        return TaskAcceptedResponse(task_id=task_id, status="processing")
     
     except Exception as e:  
         raise HTTPException(
@@ -76,7 +86,9 @@ async def generate_workout_program(
 @router.get(
     path="/{user_id}",
     response_model=WorkoutProgramResponse,
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    summary="Получить активную программу пользователя",
+    description="Возвращает текущую активную программу тренировок для указанного пользователя.",
 )
 async def get_program_by_user_id(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)):
     service = WorkoutProgramService(uow)

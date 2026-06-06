@@ -25,3 +25,8 @@ class IUserRepository(ABC):
     @abstractmethod
     async def delete(self, user_id: UUID) -> None:
         ...
+
+    
+    @abstractmethod
+    async def get_by_telegram_id(self, telegram_id: int) -> User | None:
+        ...
