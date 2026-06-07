@@ -1,21 +1,24 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
-from starlette.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+from starlette import status
 
-from app.application.services.user_service import UserService
-from app.application.dependencies import get_uow
+from redis.asyncio import Redis
+
+from app.application.services.user_service import UserService, AuthService
+from app.application.dependencies import get_uow, get_redis_repository, get_current_user
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
 from app.infrastructure.security.password import hash_password 
-from app.application.dto.identity import UserCreateDTO, UserResponseDTO
+from app.application.dto.identity import UserCreateDTO, UserResponseDTO, LoginDTO
+from app.application.dto.tokens import TokenResponseDTO, RefreshTokenDTO
 
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
 
 @router.post(
-    path="/", 
+    path="/register", 
     response_model=UserResponseDTO,
-    status_code=HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED
 )
 async def create_user(dto: UserCreateDTO, uow: IUnitOfWork = Depends(get_uow)):
     service = UserService(uow)
@@ -28,35 +31,35 @@ async def create_user(dto: UserCreateDTO, uow: IUnitOfWork = Depends(get_uow)):
             profile=dto.profile.to_domain()
         )
     except ValueError as e:
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
     return UserResponseDTO.model_validate(user)
 
 
-@router.get(
-    path="/{user_id}",
-    response_model=UserResponseDTO,
-    status_code=HTTP_200_OK
+@router.post(
+    path="/login",
+    response_model=TokenResponseDTO,
+    status_code=status.HTTP_200_OK
 )
-async def get_user(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)):
-    service = UserService(uow)
-    user = await service.get_user(user_id)
-    if not user:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="User not found")
-    
-    return UserResponseDTO.model_validate(user)
+async def login(
+    dto: LoginDTO,
+    redis: Redis = Depends(get_redis_repository),
+    uow: IUnitOfWork = Depends(get_uow)
+):
+    service = AuthService(uow, redis)
+    return await service.login(dto)
 
 
 @router.get(
     path="/telegram/{telegram_id}",
     response_model=UserResponseDTO,
-    status_code=HTTP_200_OK
+    status_code=status.HTTP_200_OK
 )
 async def get_user_by_telegram_id(telegram_id: int, uow: IUnitOfWork = Depends(get_uow)):
     service = UserService(uow)
     user = await service.get_user_by_telegram_id(telegram_id)
     if not user:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
     return UserResponseDTO.model_validate(user)
 
@@ -64,8 +67,49 @@ async def get_user_by_telegram_id(telegram_id: int, uow: IUnitOfWork = Depends(g
 @router.get(
     path="/exists/phone/{phone}",
     response_model=bool,
-    status_code=HTTP_200_OK
+    status_code=status.HTTP_200_OK
 )
 async def exists_by_phone(phone: str, uow: IUnitOfWork = Depends(get_uow)):
     service = UserService(uow)
     return await service.check_phone(phone)
+
+
+@router.post(
+    path="/refresh",
+    response_model=TokenResponseDTO,
+    status_code=status.HTTP_200_OK
+)
+async def refresh(
+    dto: RefreshTokenDTO,
+    uow: IUnitOfWork = Depends(get_uow),
+    redis: Redis = Depends(get_redis_repository)
+):
+    service = AuthService(uow, redis)
+    return await service.refresh(dto.refresh_token)
+
+
+@router.post(
+    path="/logout",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def logout(
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow),
+    redis: Redis = Depends(get_redis_repository)
+):
+    service = AuthService(uow, redis)
+    await service.logout(user_id=str(current_user.id))
+
+
+@router.get(
+    path="/{user_id}",
+    response_model=UserResponseDTO,
+    status_code=status.HTTP_200_OK
+)
+async def get_user(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)):
+    service = UserService(uow)
+    user = await service.get_user(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    return UserResponseDTO.model_validate(user)

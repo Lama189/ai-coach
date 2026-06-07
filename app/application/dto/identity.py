@@ -1,6 +1,7 @@
+import re
 from typing import Optional
 from datetime import datetime, timezone
-from pydantic import BaseModel, UUID4, Field, ConfigDict
+from pydantic import BaseModel, UUID4, Field, ConfigDict, field_validator
 
 from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
 from app.domain.identity.user_profile import UserProfile
@@ -55,3 +56,33 @@ class UserResponseDTO(BaseModel):
     profile: UserProfileResponseDTO | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserCachedDTO(BaseModel):
+    id: UUID4
+    username: str
+    phone: str
+    telegram_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LoginDTO(BaseModel):
+    phone: str
+    password: str
+    telegram_id: int | None
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        if not re.fullmatch(r"\+998\d{9}", v):
+            raise ValueError("Неверный формат номера. Ожидается +998XXXXXXXXX")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError("Пароль должен быть не менее 6 символов")
+        return v

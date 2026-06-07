@@ -69,7 +69,7 @@ class APIClient:
         try:
             response = await self._request_with_retry(
                 "POST",
-                f"/api/v1/users/",
+                f"/api/v1/users/register",
                 json=user_data
             )
             return response.json()
