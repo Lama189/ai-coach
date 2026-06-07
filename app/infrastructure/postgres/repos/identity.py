@@ -23,6 +23,7 @@ class PostgresUserRepository(IUserRepository):
             self._session.add(model)
         else:
             existing.username = user.username
+            existing.phone = user.phone
             existing.telegram_id = user.telegram_id
             existing.password_hash = user.password_hash
             existing.updated_at = user.updated_at
@@ -39,49 +40,27 @@ class PostgresUserRepository(IUserRepository):
                 existing.profile = self._profile_to_model(user.profile, user.id)
 
         await self._session.flush()
+    
 
+    async def get_by(self, with_relations: bool = True, **kwargs) -> User | None:
+        stmt = select(UserModel).filter_by(**kwargs)
 
-    async def get_by_id(self, user_id: UUID) -> User | None:
-        stmt = (
-            select(UserModel)
-            .options(
+        if with_relations:
+            stmt = stmt.options(
                 selectinload(UserModel.profile),
                 selectinload(UserModel.sessions),
                 selectinload(UserModel.workout_programs),
             )
-            .where(UserModel.id == user_id)
-        )
 
         model = (await self._session.execute(stmt)).scalar_one_or_none()
         return self._to_domain(model) if model else None
     
 
-    async def get_by_telegram_id(self, telegram_id: int) -> User | None:
-        stmt = (
-            select(UserModel)
-            .options(
-                selectinload(UserModel.profile),
-                selectinload(UserModel.sessions),
-                selectinload(UserModel.workout_programs),
-            )
-            .where(UserModel.telegram_id == telegram_id)
-        )
+    async def exists_by(self, **kwargs) -> bool:
+        stmt = select(select(UserModel).filter_by(**kwargs).exists())
 
-        model = (await self._session.execute(stmt)).scalar_one_or_none()
-        return self._to_domain(model) if model else None
-    
-
-    async def get_by_username(self, username: str) -> User | None:
-        stmt = select(UserModel).where(UserModel.username == username)
         result = await self._session.execute(stmt)
-        model = result.scalar_one_or_none()
-        return self._to_domain(model) if model else None
-    
-
-    async def exists_by_username(self, username: str) -> bool | None:
-        stmt = select(exists().where(UserModel.username == username))
-        result = await self._session.execute(stmt)
-        return result.scalar_one()
+        return bool(result.scalar())
     
 
     async def delete(self, user_id: UUID) -> None:
@@ -108,6 +87,7 @@ class PostgresUserRepository(IUserRepository):
         return User(
             id=model.id,
             username=model.username,
+            phone=model.phone,
             telegram_id=model.telegram_id,
             password_hash=model.password_hash,
             profile=profile,
@@ -120,11 +100,13 @@ class PostgresUserRepository(IUserRepository):
         model = UserModel(
             id=user.id,
             username=user.username,
+            phone=user.phone,
             telegram_id=user.telegram_id,
             password_hash=user.password_hash,
             created_at=user.created_at,
             updated_at=user.updated_at,
         )
+        
         if user.profile:
             model.profile = self._profile_to_model(user.profile, user.id)
         return model

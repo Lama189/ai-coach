@@ -7,12 +7,12 @@ from app.domain.identity.user_profile import UserProfile
 
 
 class UserProfileCreateDTO(BaseModel):
-    gender: UserGender
-    age: int = Field(gt=10, lt=100)
-    height_cm: int = Field(gt=50)
-    weight_kg: float = Field(gt=20, lt=300)
-    goal: FitnessGoal
-    experience_level: ExperienceLevel
+    gender: UserGender | None = None
+    age: int | None = Field(gt=10, lt=100, default=None)
+    height_cm: int | None = Field(gt=50, default=None)
+    weight_kg: float | None = Field(gt=20, lt=300, default=None)
+    goal: FitnessGoal | None = None
+    experience_level: ExperienceLevel | None = None
 
     def to_domain(self) -> UserProfile:
         now = datetime.now(timezone.utc)
@@ -30,18 +30,19 @@ class UserProfileCreateDTO(BaseModel):
 
 class UserCreateDTO(BaseModel):
     username: str = Field(min_length=3, max_length=40)
+    phone: str = Field(min_length=5, max_length=50)
     password: str = Field(min_length=8)
     telegram_id: int | None = None
-    profile: UserProfileCreateDTO
+    profile: UserProfileCreateDTO = Field(default_factory=UserProfileCreateDTO)
 
 
 class UserProfileResponseDTO(BaseModel):
-    gender: UserGender
-    age: int
-    height_cm: int
-    weight_kg: float
-    goal: FitnessGoal
-    experience_level: ExperienceLevel
+    gender: UserGender | None
+    age: int | None
+    height_cm: int | None
+    weight_kg: float | None
+    goal: FitnessGoal | None
+    experience_level: ExperienceLevel | None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -49,6 +50,7 @@ class UserProfileResponseDTO(BaseModel):
 class UserResponseDTO(BaseModel):
     id: UUID4
     username: str
+    phone: str
     telegram_id: int | None = None
     profile: UserProfileResponseDTO | None = None
 

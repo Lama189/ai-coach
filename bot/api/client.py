@@ -1,6 +1,5 @@
 import httpx
 
-
 class APIClient:
     def __init__(self, base_url: str) -> None:
         self._client = httpx.AsyncClient(
@@ -52,3 +51,28 @@ class APIClient:
             if e.response.status_code == 404:
                 return None
             raise
+
+    
+    async def check_phone(self, phone: str) -> bool:
+        try:
+            response = await self._request_with_retry(
+                "GET",
+                f"/api/v1/users/exists/phone/{phone}"
+            )
+            return bool(response.json())
+        
+        except httpx.HTTPStatusError as e:
+            raise e
+        
+    
+    async def register_user(self, user_data: dict) -> dict:
+        try:
+            response = await self._request_with_retry(
+                "POST",
+                f"/api/v1/users/",
+                json=user_data
+            )
+            return response.json()
+        
+        except httpx.HTTPStatusError as e:
+            raise e

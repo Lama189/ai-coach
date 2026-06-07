@@ -6,12 +6,12 @@ from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
 
 @dataclass
 class UserProfile:
-    gender: UserGender
-    age: int
-    height_cm: int
-    weight_kg: float
-    goal: FitnessGoal
-    experience_level: ExperienceLevel
+    gender: UserGender | None
+    age: int | None
+    height_cm: int | None
+    weight_kg: float | None
+    goal: FitnessGoal | None
+    experience_level: ExperienceLevel | None
     created_at: datetime
     updated_at: datetime
 
@@ -22,3 +22,13 @@ class UserProfile:
         self.weight_kg = weight_kg
         self.height_cm = height_cm
         self.updated_at = datetime.now(timezone.utc)
+
+    def is_complete(self) -> bool:
+        return all([
+            self.gender is not None,
+            self.age is not None,
+            self.height_cm is not None,
+            self.weight_kg is not None,
+            self.goal is not None,
+            self.experience_level is not None
+        ])

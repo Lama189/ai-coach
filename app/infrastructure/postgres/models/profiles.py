@@ -29,13 +29,13 @@ class UserProfile(BaseModel):
         nullable=False
     )
 
-    gender: Mapped[UserGender] = mapped_column(SqlEnum(UserGender, name="gender"), nullable=False)
-    age: Mapped[int] = mapped_column(Integer, nullable=False)
-    height_cm: Mapped[int] = mapped_column(Integer, nullable=False)
-    weight_kg: Mapped[float] = mapped_column(Float, nullable=False)
+    gender: Mapped[UserGender | None] = mapped_column(SqlEnum(UserGender, name="gender"), nullable=True)
+    age: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    height_cm: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    weight_kg: Mapped[float | None] = mapped_column(Float, nullable=True)
 
-    goal: Mapped[FitnessGoal] = mapped_column(SqlEnum(FitnessGoal, name="fitness_goal"), nullable=False)
-    experience_level: Mapped[ExperienceLevel] = mapped_column(SqlEnum(ExperienceLevel, name="experience_level"), nullable=False)
+    goal: Mapped[FitnessGoal | None] = mapped_column(SqlEnum(FitnessGoal, name="fitness_goal"), nullable=True)
+    experience_level: Mapped[ExperienceLevel | None] = mapped_column(SqlEnum(ExperienceLevel, name="experience_level"), nullable=True)
 
     created_at = mapped_column(
         DateTime(timezone=True),

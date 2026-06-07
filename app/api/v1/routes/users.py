@@ -23,6 +23,8 @@ async def create_user(dto: UserCreateDTO, uow: IUnitOfWork = Depends(get_uow)):
         user = await service.create_user(
             username=dto.username,
             password_hash=hash_password(dto.password),
+            phone=dto.phone,
+            telegram_id=dto.telegram_id,
             profile=dto.profile.to_domain()
         )
     except ValueError as e:
@@ -57,3 +59,13 @@ async def get_user_by_telegram_id(telegram_id: int, uow: IUnitOfWork = Depends(g
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="User not found")
     
     return UserResponseDTO.model_validate(user)
+
+
+@router.get(
+    path="/exists/phone/{phone}",
+    response_model=bool,
+    status_code=HTTP_200_OK
+)
+async def exists_by_phone(phone: str, uow: IUnitOfWork = Depends(get_uow)):
+    service = UserService(uow)
+    return await service.check_phone(phone)

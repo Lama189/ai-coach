@@ -9,11 +9,18 @@ class UserService:
         self._uow = uow
 
 
-    async def create_user(self, username: str, password_hash: str, profile: UserProfile) -> User:
-        if await self._uow.users.exists_by_username(username):
+    async def create_user(
+        self, 
+        username: str, 
+        password_hash: str, 
+        phone: str,
+        telegram_id: int,
+        profile: UserProfile
+    ) -> User:
+        if await self._uow.users.exists_by(username=username):
             raise ValueError(f"Username '{username}' уже занят")
         
-        user = User(username=username, password_hash=password_hash)
+        user = User(username=username, password_hash=password_hash, phone=phone, telegram_id=telegram_id)
         user.assighn_profile(profile)
 
         await self._uow.users.save(user)
@@ -22,15 +29,19 @@ class UserService:
     
 
     async def get_user(self, user_id: UUID) -> User | None:
-        return await self._uow.users.get_by_id(user_id)
+        return await self._uow.users.get_by(True, id=user_id)
     
     
     async def get_user_by_telegram_id(self, telegram_id: int) -> User | None:
-        return await self._uow.users.get_by_telegram_id(telegram_id)
+        return await self._uow.users.get_by(True, telegram_id=telegram_id)
+    
+
+    async def check_phone(self, phone: str) -> bool:
+        return await self._uow.users.exists_by(phone=phone)
     
     
     async def update_weight(self, user_id: UUID, new_weight: float) -> User:
-        user = await self._uow.users.get_by_id(user_id)
+        user = await self._uow.users.get_by(True, id=user_id)
         if not user or not user.profile:
             raise ValueError("Пользователь или профиль не найдены")
         

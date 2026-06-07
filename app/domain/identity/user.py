@@ -8,6 +8,7 @@ from app.domain.identity.user_profile import UserProfile
 @dataclass
 class User:
     username: str
+    phone: str
     password_hash: str
     id: UUID = field(default_factory=uuid4)
     telegram_id: int | None = None

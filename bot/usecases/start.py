@@ -1,6 +1,4 @@
-from aiogram import F, Router, types
-from aiogram.filters.command import Command
-from aiogram.fsm.context import FSMContext
+from aiogram import types
 
 
 async def start_usecase(message: types.Message):
