@@ -1,11 +1,12 @@
 from uuid import UUID, uuid4
 from datetime import datetime
-from sqlalchemy import Text, DateTime, ForeignKey
+from sqlalchemy import Text, DateTime, ForeignKey, Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from pgvector.sqlalchemy import Vector
 
 from app.infrastructure.postgres.models.base_model import BaseModel
+from app.domain.enums import InsightTag
 
 class UserInsight(BaseModel):
     __tablename__ = "user_insights"
@@ -14,6 +15,7 @@ class UserInsight(BaseModel):
     user_id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
    
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    tag: Mapped[InsightTag] = mapped_column(SqlEnum(InsightTag, name="tag"), nullable=False)
     
     embedding: Mapped[list[float]] = mapped_column(Vector(384), nullable=False)
     

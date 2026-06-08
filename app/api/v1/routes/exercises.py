@@ -1,6 +1,6 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
-from starlette.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+from starlette import status
 
 from app.application.services.exercise_service import ExerciseService
 from app.application.dependencies import get_uow, get_embedding_service
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/v1/exercises", tags=["exercises"])
 @router.post(
     path="/",
     response_model=ExerciseResponseDTO,
-    status_code=HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED
 )
 async def create_exercise(
     dto: CreateExerciseDTO, 
@@ -30,6 +30,6 @@ async def create_exercise(
             description=dto.description
         )
     except ValueError as e:
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
     return ExerciseResponseDTO.model_validate(exercise)

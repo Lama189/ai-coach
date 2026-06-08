@@ -41,16 +41,6 @@ class PostgresWorkoutProgramRepository(IWorkoutProgramRepository):
         model = (await self._session.execute(stmt)).scalar_one_or_none()
         return self._to_domain(model) if model else None
 
-    
-    def _to_domain(self, model: WorkoutProgramModel) -> WorkoutProgram:
-        return WorkoutProgram(
-            user_id=model.user_id,
-            name=model.name,
-            is_active=model.is_active,
-            id=model.id,
-            description=model.description,
-        )
-    
 
     async def get_by_task_id(self, task_id: UUID) -> WorkoutProgram | None:
         stmt = (
@@ -76,6 +66,16 @@ class PostgresWorkoutProgramRepository(IWorkoutProgramRepository):
 
         await self._session.execute(stmt)
     
+
+    def _to_domain(self, model: WorkoutProgramModel) -> WorkoutProgram:
+        return WorkoutProgram(
+            user_id=model.user_id,
+            name=model.name,
+            is_active=model.is_active,
+            id=model.id,
+            description=model.description,
+        )
+
 
     def _to_model(self, model: WorkoutProgram, task_id: UUID | None = None) -> WorkoutProgramModel:
         return WorkoutProgramModel(

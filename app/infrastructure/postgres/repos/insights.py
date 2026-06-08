@@ -12,7 +12,7 @@ class PostgresUserInsightRepository(IUserInsightRepository):
         self._session = session
 
     
-    async def save(self, insight: UserInsight) -> None:
+    async def save(self, insight: UserInsight, embedding: list[float] | None = None) -> None:
         stmt = select(UserInsightModel).where(UserInsightModel.id == insight.id)
         existing = (await self._session.execute(stmt)).scalar_one_or_none()
 
@@ -21,12 +21,15 @@ class PostgresUserInsightRepository(IUserInsightRepository):
                 id=insight.id,
                 user_id=insight.user_id,
                 content=insight.content,
-                embedding=insight.embedding
+                tag=insight.tag,
+                embedding=embedding
             )
             self._session.add(model)
         else:
             existing.content = insight.content
-            existing.embedding = insight.embedding
+            existing.tag = insight.tag
+            if embedding:
+                existing.embedding = embedding
 
         await self._session.flush()
 
@@ -46,7 +49,7 @@ class PostgresUserInsightRepository(IUserInsightRepository):
                 id=m.id,
                 user_id=m.user_id,
                 content=m.content,
-                embedding=m.embedding
+                tag=m.tag,
             )
             for m in models
         ]

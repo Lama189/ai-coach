@@ -4,11 +4,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 from redis import asyncio as aioredis
+
+from app.core.config import get_settings
+from app.application.dependencies import get_embedding_service
+
 from app.api.v1.routes.users import router as users_router
 from app.api.v1.routes.exercises import router as exercises_router
 from app.api.v1.routes.programs import router as programs_router
-from app.application.dependencies import get_embedding_service
-from app.core.config import get_settings
+from app.api.v1.routes.insights import router as insights_router
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -51,3 +55,4 @@ async def root():
 app.include_router(users_router)
 app.include_router(exercises_router)
 app.include_router(programs_router)
+app.include_router(insights_router)

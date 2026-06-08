@@ -8,10 +8,12 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
     func,
-    Text
+    Text,
+    String
 )
 
 from app.infrastructure.postgres.models.base_model import BaseModel
+from app.domain.enums import SessionStatus
 
 if TYPE_CHECKING:
     from app.infrastructure.postgres.models.users import User
@@ -29,7 +31,7 @@ class Session(BaseModel):
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False
     )
-    program_id: Mapped[UUID] = mapped_column(
+    program_id: Mapped[UUID | None] = mapped_column(
         PG_UUID(as_uuid=True),
         ForeignKey("workout_programs.id", ondelete="SET NULL"), 
         nullable=True
@@ -39,17 +41,20 @@ class Session(BaseModel):
     user: Mapped["User"] = relationship("User", back_populates="sessions")
     workout_program: Mapped["WorkoutProgram"] = relationship("WorkoutProgram", back_populates="sessions")
 
+    status: Mapped[str] = mapped_column(
+        String(20),
+        default=SessionStatus.active,
+        nullable=False,
+    )
     started_at = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False
     )
 
-    finished_at = mapped_column(
+    finished_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False
+        nullable=True,  
     )
 
     notes: Mapped[str] = mapped_column(Text, nullable=True)

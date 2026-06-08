@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, UUID4, Field, ConfigDict, field_validator
 
-from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
+from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel, InsightTag
 from app.domain.identity.user_profile import UserProfile
 
 
@@ -86,3 +86,16 @@ class LoginDTO(BaseModel):
         if len(v) < 6:
             raise ValueError("Пароль должен быть не менее 6 символов")
         return v
+    
+
+class CreateInsightDTO(BaseModel):
+    content: str
+    tag: InsightTag
+
+
+class InsightResponseDTO(BaseModel):
+    id: UUID4
+    content: str
+    tag: InsightTag
+
+    model_config = ConfigDict(from_attributes=True)

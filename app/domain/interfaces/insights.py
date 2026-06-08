@@ -6,7 +6,7 @@ from app.domain.identity.insight import UserInsight
 class IUserInsightRepository(ABC):
 
     @abstractmethod
-    async def save(self, insight: UserInsight) -> None:
+    async def save(self, insight: UserInsight, embedding: list[float] | None = None) -> None:
         ...
 
     

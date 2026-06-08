@@ -30,3 +30,20 @@ class MuscleGroup(str, Enum):
     CORE = "core"
     FULL_BODY = "full_body"
     CARDIO = "cardio"
+
+
+class SessionStatus(str, Enum):
+    active = "active"
+    completed = "completed"
+    cancelled = "cancelled"
+
+
+class InsightTag(str, Enum):
+    injury      = "injury"       # травма, боль, дискомфорт
+    progress    = "progress"     # прогресс, личный рекорд
+    fatigue     = "fatigue"      # усталость, перетренированность
+    preference  = "preference"   # предпочтения, что нравится/не нравится
+    schedule    = "schedule"     # расписание, время тренировок
+    nutrition   = "nutrition"    # питание, восстановление
+    technique   = "technique"    # техника, форма выполнения
+    mental      = "mental"       # мотивация, психологическое состояние
