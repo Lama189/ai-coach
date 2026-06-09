@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from app.core.security import SecurityUtils
+from app.core.extensions import UserNotFoundError, InvalidPasswordError
 from app.domain.identity.user import User, UserProfile
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
 from app.application.dto.identity import LoginDTO
@@ -68,12 +69,12 @@ class AuthService:
 
     async def login(self, dto: LoginDTO) -> TokenResponseDTO:
         user = await self._uow.users.get_by(True, phone=dto.phone)
-
         if not user:
-            raise ValueError("Неверные данные для входа")
+            raise UserNotFoundError()
+
 
         if not SecurityUtils.verify_password(dto.password, user.password_hash):
-            raise ValueError("Неверные данные для входа")
+            raise InvalidPasswordError()
 
         payload = {
             "sub": str(user.id),
@@ -96,6 +97,7 @@ class AuthService:
         return TokenResponseDTO(
             access_token=access_token,
             refresh_token=refresh_token,
+            user_id=user.id
         )
 
     async def refresh(self, refresh_token: str) -> TokenResponseDTO:
@@ -111,6 +113,7 @@ class AuthService:
         return TokenResponseDTO(
             access_token=new_access,
             refresh_token=refresh_token,
+            user_id=user_id
         )
 
     async def logout(self, user_id: str) -> None:

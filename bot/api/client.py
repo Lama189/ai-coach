@@ -1,7 +1,9 @@
 import httpx
 
+from bot.infrastructure.redis.repository import BotRedisRepository
+
 class APIClient:
-    def __init__(self, base_url: str) -> None:
+    def __init__(self, base_url: str, redis: BotRedisRepository) -> None:
         self._client = httpx.AsyncClient(
             base_url=base_url,
             timeout=httpx.Timeout(
@@ -11,6 +13,7 @@ class APIClient:
                 pool=5.0
             ),
         )
+        self._redis = redis
 
     
     async def _request_with_retry(
@@ -76,3 +79,27 @@ class APIClient:
         
         except httpx.HTTPStatusError as e:
             raise e
+        
+
+    async def login(self, user_data: dict) -> dict:
+        try:
+            response = await self._request_with_retry(
+                "POST",
+                f"/api/v1/users/login",
+                json=user_data
+            )
+        
+        except httpx.HTTPStatusError as e:
+            raise e
+        
+        response.raise_for_status()
+        response_data = response.json()
+
+        await self._redis.set_access_token(user_data["telegram_id"], response_data["access_token"])
+        await self._redis.set_refresh_token(user_data["telegram_id"], response_data["refresh_token"])
+        await self._redis.set_user_id(user_data["telegram_id"], str(response_data["user_id"]))
+
+        return response_data
+
+        
+

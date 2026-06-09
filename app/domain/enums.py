@@ -47,3 +47,9 @@ class InsightTag(str, Enum):
     nutrition   = "nutrition"    # питание, восстановление
     technique   = "technique"    # техника, форма выполнения
     mental      = "mental"       # мотивация, психологическое состояние
+
+
+class Location(str, Enum):
+    gym     = "gym"
+    home    = "home"
+    outdoor = "outdoor"

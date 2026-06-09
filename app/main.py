@@ -1,7 +1,8 @@
 import logging
 import app.infrastructure.postgres.models
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from redis import asyncio as aioredis
 
@@ -56,3 +57,11 @@ app.include_router(users_router)
 app.include_router(exercises_router)
 app.include_router(programs_router)
 app.include_router(insights_router)
+
+
+@app.exception_handler(ValueError)
+async def velue_error_exception_handler(req: Request, exc: ValueError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"detail": str(exc)},
+    )

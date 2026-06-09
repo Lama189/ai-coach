@@ -28,3 +28,16 @@ async def register_user(
         "username": full_name,
         "password": password,
     })
+
+
+async def login_user(
+    telegram_id: int,
+    phone: str,
+    password: str,
+    api_client: APIClient,
+) -> dict:
+    return await api_client.login({
+        "phone": phone,
+        "password": password,
+        "telegram_id": telegram_id,
+    })

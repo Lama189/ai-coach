@@ -1,6 +1,8 @@
 from abc import abstractmethod, ABC
 from uuid import UUID
+
 from app.domain.identity.insight import UserInsight
+from app.domain.enums import InsightTag
 
 
 class IUserInsightRepository(ABC):
@@ -11,5 +13,10 @@ class IUserInsightRepository(ABC):
 
     
     @abstractmethod
-    async def search_by_vector(self, user_id: UUID, query_embedding: list[float], limit: int = 3) -> list[UserInsight]:
+    async def search_by(
+        self, user_id: UUID | None, 
+        query_embedding: list[float] | None = None, 
+        tags: list[InsightTag] | None = None,
+        limit: int = 3
+    ) -> list[UserInsight]:
         ...

@@ -4,6 +4,7 @@ from starlette import status
 
 from redis.asyncio import Redis
 
+from app.core.extensions import UserNotFoundError, InvalidPasswordError
 from app.application.services.user_service import UserService, AuthService
 from app.application.dependencies import get_uow, get_redis_repository, get_current_user
 from app.infrastructure.postgres.unit_of_work import IUnitOfWork
@@ -47,7 +48,12 @@ async def login(
     uow: IUnitOfWork = Depends(get_uow)
 ):
     service = AuthService(uow, redis)
-    return await service.login(dto)
+    try:
+        return await service.login(dto)
+    except UserNotFoundError:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    except InvalidPasswordError:
+        raise HTTPException(status_code=401, detail="Неверный пароль")
 
 
 @router.get(

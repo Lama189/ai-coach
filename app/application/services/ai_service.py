@@ -66,21 +66,28 @@ class AIService:
 
     async def _build_prompt(self, dto: GenerateProgram) -> str:
         async with self._uow_factory() as uow:
-            user = await uow.users.get_by_id(dto.user_id)
+            user = await uow.users.get_by(id=dto.user_id)
             if user is None:
                 raise ValueError("Пользователь не найден")
 
             profile = user.profile
             if profile is None:
                 raise ValueError("Профиль пользователя отсутствует")
+            
+            if profile.is_complete:
+                assert profile.gender is not None
+                assert profile.goal is not None
+                assert profile.experience_level is not None
 
-            username = user.username
-            gender_val = profile.gender.value
-            age = profile.age
-            height = profile.height_cm
-            weight = profile.weight_kg
-            goal_val = profile.goal.value
-            exp_val = profile.experience_level.value
+                username = user.username
+                gender_val = profile.gender.value
+                age = profile.age
+                height = profile.height_cm
+                weight = profile.weight_kg
+                goal_val = profile.goal.value
+                exp_val = profile.experience_level.value
+            else:
+                raise ValueError("Профиль полностью не заполнен")
 
         prompt = f"""
                 Ты элитный персональный фитнес-тренер.
