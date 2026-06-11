@@ -8,10 +8,10 @@ from app.main import app
 from app.domain.identity.user import User
 from app.domain.identity.user_profile import UserProfile
 from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.redis.repos.repository import RedisRepository
 from app.application.dependencies import get_uow, get_redis_repository
-from app.infrastructure.security.password import hash_password
+from app.core.security import SecurityUtils
 from app.core.security import SecurityUtils
 
 
@@ -64,7 +64,7 @@ class TestUsersRouter:
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
 
-        with patch("app.api.v1.routes.users.hash_password", return_value="hashed_password"):
+        with patch.object(SecurityUtils, "hash_password", return_value="hashed_password"):
             transport = ASGITransport(app=app)
             async with AsyncClient(transport=transport, base_url="http://test") as client:
                 response = await client.post(
@@ -89,7 +89,7 @@ class TestUsersRouter:
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
 
-        with patch("app.api.v1.routes.users.hash_password", return_value="hashed_password"):
+        with patch.object(SecurityUtils, "hash_password", return_value="hashed_password"):
             transport = ASGITransport(app=app)
             async with AsyncClient(transport=transport, base_url="http://test") as client:
                 response = await client.post(

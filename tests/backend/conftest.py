@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from app.domain.identity.user import User
 from app.domain.identity.user_profile import UserProfile
 from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.postgres.repos.identity import PostgresUserRepository
 from app.infrastructure.redis.repos.repository import RedisRepository
 

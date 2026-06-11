@@ -3,13 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.postgres.database import async_session_maker
 
-from app.domain.interfaces.identity import IUserRepository
-from app.domain.interfaces.exercises import IExerciseRepository
-from app.domain.interfaces.program import IWorkoutProgramRepository
-from app.domain.interfaces.workout_day import IWorkoutDayRepository
-from app.domain.interfaces.workout_day_exercise import IWorkoutDayExerciseRepository
-from app.domain.interfaces.insights import IUserInsightRepository
-from app.domain.interfaces.intents import IUserIntentRepository
+from app.application.interfaces.unit_of_work import IUnitOfWork
 
 from app.infrastructure.postgres.repos.identity import PostgresUserRepository
 from app.infrastructure.postgres.repos.exercises import PostgresExerciseRepository
@@ -18,19 +12,6 @@ from app.infrastructure.postgres.repos.workout_days import PostgresWorkoutDayRep
 from app.infrastructure.postgres.repos.workout_day_exercises import PostgresWorkoutDayExerciseRepository
 from app.infrastructure.postgres.repos.insights import PostgresUserInsightRepository
 from app.infrastructure.postgres.repos.intents import PostgresUserIntentRepository
-
-
-class IUnitOfWork:
-    users: IUserRepository
-    exercises: IExerciseRepository
-    programs: IWorkoutProgramRepository
-    workout_days: IWorkoutDayRepository
-    workout_days_exercise: IWorkoutDayExerciseRepository
-    insights: IUserInsightRepository
-    intents: IUserIntentRepository
-
-    async def commit(self) -> None: ...
-    async def rollback(self) -> None: ...
 
 
 class PostgresUnitOfWork(IUnitOfWork):

@@ -9,7 +9,7 @@ from app.application.dto.program import GenerateProgram
 from app.core.extensions import UserNotFoundError
 from app.domain.identity.user import User
 from app.domain.identity.insight import UserInsight
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.application.dto.intents import IntentSchema
 from app.domain.identity.intents import UserIntent

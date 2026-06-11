@@ -1,7 +1,7 @@
 import asyncio
 
 from sentence_transformers import SentenceTransformer
-from app.domain.interfaces.embedding import IEmbeddingService
+from app.application.interfaces.embedding import IEmbeddingService
 
 class SentenceTransformerEmbeddingService(IEmbeddingService):
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.domain.identity.insight import UserInsight
 from app.application.dto.identity import CreateInsightDTO
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService

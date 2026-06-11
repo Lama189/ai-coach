@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.workout_day import WorkoutDay
-from app.domain.interfaces.workout_day import IWorkoutDayRepository
+from app.application.interfaces.workout_day import IWorkoutDayRepository
 from app.infrastructure.postgres.models.workout_days import WorkoutDay as WorkoutDayModel
 
 

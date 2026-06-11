@@ -4,7 +4,7 @@ from sqlalchemy import select, update, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.program import WorkoutProgram
-from app.domain.interfaces.program import IWorkoutProgramRepository
+from app.application.interfaces.program import IWorkoutProgramRepository
 from app.infrastructure.postgres.models.workout_programs import WorkoutProgram as WorkoutProgramModel
 
 

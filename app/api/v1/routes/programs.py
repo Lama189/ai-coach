@@ -10,7 +10,7 @@ from app.application.dependencies import (
     get_llm_api_key, 
     get_embedding_service
 )
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.application.dto.program import (
     WorkoutProgramCreate, 

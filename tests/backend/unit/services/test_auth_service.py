@@ -8,7 +8,7 @@ from app.domain.identity.user_profile import UserProfile
 from app.application.services.user_service import AuthService
 from app.application.dto.identity import LoginDTO
 from app.core.extensions import UserNotFoundError, InvalidPasswordError
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.redis.repos.repository import RedisRepository
 from app.core.security import SecurityUtils
 

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.exercise import Exercise
 from app.domain.enums import MuscleGroup
-from app.domain.interfaces.exercises import IExerciseRepository
+from app.application.interfaces.exercises import IExerciseRepository
 from app.infrastructure.postgres.models.exercises import Exercise as ExerciseModel
 
 

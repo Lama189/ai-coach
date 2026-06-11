@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.identity.user import User
 from app.domain.identity.user_profile import UserProfile
-from app.domain.interfaces.identity import IUserRepository
+from app.application.interfaces.identity import IUserRepository
 from app.infrastructure.postgres.models.users import User as UserModel
 from app.infrastructure.postgres.models.profiles import UserProfile as UserProfileModel
 

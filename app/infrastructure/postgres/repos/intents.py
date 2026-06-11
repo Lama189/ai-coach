@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.identity.intents import UserIntent
-from app.domain.interfaces.intents import IUserIntentRepository
+from app.application.interfaces.intents import IUserIntentRepository
 from app.infrastructure.postgres.models.intents import UserIntentModel
 
 

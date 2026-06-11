@@ -3,7 +3,7 @@ from uuid import UUID
 from app.core.security import SecurityUtils
 from app.core.extensions import UserNotFoundError, InvalidPasswordError
 from app.domain.identity.user import User, UserProfile
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.application.dto.identity import LoginDTO
 from app.infrastructure.redis.repos.repository import RedisRepository
 from app.application.dto.tokens import TokenResponseDTO

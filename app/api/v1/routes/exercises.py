@@ -5,7 +5,7 @@ from starlette import status
 from app.application.services.exercise_service import ExerciseService
 from app.application.dependencies import get_uow, get_embedding_service
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.application.dto.training import CreateExerciseDTO, ExerciseResponseDTO
 
 

@@ -8,7 +8,8 @@ from collections.abc import AsyncGenerator
 from app.core.config import get_settings
 from app.core.security import SecurityUtils
 
-from app.infrastructure.postgres.unit_of_work import PostgresUnitOfWork, IUnitOfWork
+from app.infrastructure.postgres.unit_of_work import PostgresUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.infrastructure.redis.client import get_redis_client
 from app.infrastructure.redis.repos.repository import RedisRepository

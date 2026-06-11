@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.domain.training.program import WorkoutProgram
 from app.domain.training.workout_day import WorkoutDay
 from app.domain.training.workout_day_exercise import WorkoutDayExercise

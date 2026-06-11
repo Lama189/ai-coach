@@ -34,7 +34,7 @@ from app.domain.training.exercise import Exercise
 from app.domain.training.program import WorkoutProgram
 from app.domain.training.workout_day import WorkoutDay
 from app.domain.training.workout_day_exercise import WorkoutDayExercise
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 
 

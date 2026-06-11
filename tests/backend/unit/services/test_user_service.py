@@ -6,7 +6,7 @@ from app.domain.identity.user import User
 from app.domain.identity.user_profile import UserProfile
 from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
 from app.application.services.user_service import UserService
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 
 
 @pytest.mark.asyncio

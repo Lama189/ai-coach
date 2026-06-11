@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.session import WorkoutSessionDomain
 from app.infrastructure.postgres.models.session import Session as WorkoutSessionModel
-from app.domain.interfaces.session import ISessionRepository
+from app.application.interfaces.session import ISessionRepository
 
 
 #TODO: Доделать

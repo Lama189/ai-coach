@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.identity.insight import UserInsight
 from app.domain.enums import InsightTag
-from app.domain.interfaces.insights import IUserInsightRepository
+from app.application.interfaces.insights import IUserInsightRepository
 from app.infrastructure.postgres.models.insights import UserInsight as UserInsightModel
 
 

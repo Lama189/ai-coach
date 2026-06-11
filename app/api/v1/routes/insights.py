@@ -5,7 +5,7 @@ from starlette import status
 from app.application.services.insight_service import InsightService
 from app.application.dependencies import get_uow, get_embedding_service, get_current_user
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.application.dto.identity import CreateInsightDTO, InsightResponseDTO
 
 

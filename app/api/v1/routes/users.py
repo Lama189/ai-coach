@@ -7,8 +7,8 @@ from redis.asyncio import Redis
 from app.core.extensions import UserNotFoundError, InvalidPasswordError
 from app.application.services.user_service import UserService, AuthService
 from app.application.dependencies import get_uow, get_redis_repository, get_current_user
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
-from app.infrastructure.security.password import hash_password 
+from app.application.interfaces.unit_of_work import IUnitOfWork
+from app.core.security import SecurityUtils
 from app.application.dto.identity import UserCreateDTO, UserResponseDTO, LoginDTO
 from app.application.dto.tokens import TokenResponseDTO, RefreshTokenDTO
 
@@ -26,7 +26,7 @@ async def create_user(dto: UserCreateDTO, uow: IUnitOfWork = Depends(get_uow)):
     try:
         user = await service.create_user(
             username=dto.username,
-            password_hash=hash_password(dto.password),
+            password_hash=SecurityUtils.hash_password(dto.password),
             phone=dto.phone,
             telegram_id=dto.telegram_id,
             profile=dto.profile.to_domain()

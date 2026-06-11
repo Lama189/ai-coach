@@ -2,7 +2,7 @@ from uuid import UUID
 
 from app.domain.training.exercise import Exercise
 from app.domain.enums import MuscleGroup
-from app.infrastructure.postgres.unit_of_work import IUnitOfWork
+from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 
 class ExerciseService:
