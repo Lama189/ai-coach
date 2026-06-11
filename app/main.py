@@ -60,7 +60,7 @@ app.include_router(insights_router)
 
 
 @app.exception_handler(ValueError)
-async def velue_error_exception_handler(req: Request, exc: ValueError):
+async def value_error_exception_handler(req: Request, exc: ValueError):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": str(exc)},

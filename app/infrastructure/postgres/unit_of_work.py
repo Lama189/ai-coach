@@ -47,7 +47,7 @@ class PostgresUnitOfWork(IUnitOfWork):
         self.workout_days = PostgresWorkoutDayRepository(self._session)
         self.workout_days_exercise = PostgresWorkoutDayExerciseRepository(self._session)
         self.insights = PostgresUserInsightRepository(self._session)
-        self._intents = PostgresUserIntentRepository(self._session)
+        self.intents = PostgresUserIntentRepository(self._session)
 
         return self
     

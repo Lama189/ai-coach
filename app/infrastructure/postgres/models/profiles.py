@@ -16,7 +16,8 @@ from sqlalchemy import (
 from app.infrastructure.postgres.models.base_model import BaseModel
 if TYPE_CHECKING:
     from app.infrastructure.postgres.models.users import User
-from app.domain.enums import ExperienceLevel, FitnessGoal, UserGender
+
+from app.domain.enums import ExperienceLevel, FitnessGoal, UserGender,Location
 
 
 class UserProfile(BaseModel):
@@ -36,6 +37,7 @@ class UserProfile(BaseModel):
 
     goal: Mapped[FitnessGoal | None] = mapped_column(SqlEnum(FitnessGoal, name="fitness_goal"), nullable=True)
     experience_level: Mapped[ExperienceLevel | None] = mapped_column(SqlEnum(ExperienceLevel, name="experience_level"), nullable=True)
+    location: Mapped[Location | None] = mapped_column(SqlEnum(Location, name="location"), nullable=True)
 
     created_at = mapped_column(
         DateTime(timezone=True),

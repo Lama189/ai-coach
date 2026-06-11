@@ -16,7 +16,7 @@ from app.domain.identity.intents import UserIntent
 
 
 
-class GenService:
+class IntentService:
     def __init__(
         self,
         uow_factory: Callable[[], AsyncContextManager[IUnitOfWork]],

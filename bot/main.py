@@ -24,7 +24,7 @@ async def on_shutdown(bot: Bot, redis: Redis) -> None:
 
 
 async def main():
-    redis = Redis(host="redis", port=6379, db=1)
+    redis = Redis(host=settings.redis_host, port=settings.redis_port, db=settings.redis_db)
     redis_repo = BotRedisRepository(redis)
 
     try:

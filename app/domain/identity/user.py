@@ -16,7 +16,7 @@ class User:
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
-    def assighn_profile(self, profile: UserProfile) -> None:
+    def assign_profile(self, profile: UserProfile) -> None:
         if self.profile is not None:
             raise ValueError("Профиль уже создан.")
         

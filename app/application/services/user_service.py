@@ -31,7 +31,7 @@ class UserService:
             phone=phone,
             telegram_id=telegram_id,
         )
-        user.assighn_profile(profile)
+        user.assign_profile(profile)
 
         await self._uow.users.save(user)
         await self._uow.commit()
