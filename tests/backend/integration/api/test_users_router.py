@@ -37,6 +37,7 @@ def sample_user_profile():
         weight_kg=75,
         goal=FitnessGoal.GAIN_MUSCLE,
         experience_level=ExperienceLevel.INTERMEDIATE,
+        location=None,
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
     )

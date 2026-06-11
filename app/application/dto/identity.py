@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, UUID4, Field, ConfigDict, field_validator
 
-from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel, InsightTag
+from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel, InsightTag, Location
 from app.domain.identity.user_profile import UserProfile
 
 
@@ -14,6 +14,7 @@ class UserProfileCreateDTO(BaseModel):
     weight_kg: float | None = Field(gt=20, lt=300, default=None)
     goal: FitnessGoal | None = None
     experience_level: ExperienceLevel | None = None
+    location: Location | None = None
 
     def to_domain(self) -> UserProfile:
         now = datetime.now(timezone.utc)
@@ -24,6 +25,7 @@ class UserProfileCreateDTO(BaseModel):
             weight_kg=self.weight_kg,
             goal=self.goal,
             experience_level=self.experience_level,
+            location=self.location,
             created_at=now,
             updated_at=now,
         )
@@ -44,6 +46,7 @@ class UserProfileResponseDTO(BaseModel):
     weight_kg: float | None
     goal: FitnessGoal | None
     experience_level: ExperienceLevel | None
+    location: Location | None
 
     model_config = ConfigDict(from_attributes=True)
 

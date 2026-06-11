@@ -35,6 +35,7 @@ class PostgresUserRepository(IUserRepository):
                 existing.profile.weight_kg = user.profile.weight_kg
                 existing.profile.goal = user.profile.goal
                 existing.profile.experience_level = user.profile.experience_level
+                existing.profile.location = user.profile.location
                 existing.profile.updated_at = user.profile.updated_at
             elif user.profile and not existing.profile:
                 existing.profile = self._profile_to_model(user.profile, user.id)
@@ -80,6 +81,7 @@ class PostgresUserRepository(IUserRepository):
                 weight_kg=model.profile.weight_kg,
                 goal=model.profile.goal,
                 experience_level=model.profile.experience_level,
+                location=model.profile.location,
                 created_at=model.profile.created_at,
                 updated_at=model.profile.updated_at,
             )
@@ -122,6 +124,7 @@ class PostgresUserRepository(IUserRepository):
             weight_kg=profile.weight_kg,
             goal=profile.goal,
             experience_level=profile.experience_level,
+            location=profile.location,
             created_at=profile.created_at,
             updated_at=profile.updated_at,
         )

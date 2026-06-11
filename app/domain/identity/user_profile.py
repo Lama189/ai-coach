@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
+from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel, Location
 
 
 @dataclass
@@ -12,6 +12,7 @@ class UserProfile:
     weight_kg: float | None
     goal: FitnessGoal | None
     experience_level: ExperienceLevel | None
+    location: Location | None
     created_at: datetime
     updated_at: datetime
 
