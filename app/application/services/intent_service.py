@@ -2,6 +2,7 @@ from typing import Callable, AsyncContextManager
 from uuid import UUID, uuid4
 
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from app.application.dto.program import GenerateProgram
@@ -25,10 +26,10 @@ class IntentService:
     ):
         self._uow_factory = uow_factory
         self._embedder = embedder
-        self._llm = ChatGroq(
-            api_key=api_key,
-            model="llama-3.3-70b-versatile",
-            temperature=0.3,
+        self._llm = ChatGoogleGenerativeAI(
+            google_api_key=api_key,
+            model="gemini-3.1-flash-lite",
+            temperature=0.1,
         )
 
 

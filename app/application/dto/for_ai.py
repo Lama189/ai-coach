@@ -9,6 +9,8 @@ class SearchExercisesInput(BaseModel):
 class CreateExerciseInput(BaseModel):
     name: str = Field(..., description="Название упражнения")
     muscle_group: str = Field(..., description="Группа мышц: chest, back, legs, shoulders, biceps, triceps, core, full_body, cardio")
+    equipment: str = Field(..., description="Оборудование: barbell, dumbbell, machine, bodyweight, cable, kettlebell")
+    movement_pattern: str = Field(..., description="Тип движения: push, pull, squat, hinge, rotation, carry, isolation")
     description: str | None = Field(None, description="Описание упражнения")
 
 

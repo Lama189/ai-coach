@@ -191,6 +191,8 @@ class AIService:
                     exercise = Exercise(
                         name=ex.name,
                         muscle_group=MuscleGroup(ex.muscle_group.lower()),
+                        equipment=ex.equipment,
+                        movement_pattern=ex.movement_pattern,
                         description=ex.description,
                     )
                     await uow.exercises.save_exercise(exercise, embedding)

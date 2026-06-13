@@ -8,6 +8,8 @@ from app.domain.enums import MuscleGroup
 class Exercise:
     name: str
     muscle_group: MuscleGroup
+    equipment: str
+    movement_pattern: str
     id: UUID = field(default_factory=uuid4)
     description: str | None = None
 

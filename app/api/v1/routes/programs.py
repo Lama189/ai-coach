@@ -1,19 +1,11 @@
 from uuid import UUID, uuid4
-from contextlib import asynccontextmanager
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from app.application.services.ai_service import AIService
-from app.application.services.intent_service import IntentService
 from app.application.services.program_service import WorkoutProgramService
 
-from app.application.dependencies import (
-    get_uow, 
-    get_llm_api_key, 
-    get_embedding_service
-)
+from app.application.dependencies import get_uow
 from app.application.interfaces.unit_of_work import IUnitOfWork
-from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.application.dto.program import (
     WorkoutProgramCreate, 
     WorkoutProgramResponse, 

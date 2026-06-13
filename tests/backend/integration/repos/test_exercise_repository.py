@@ -27,6 +27,8 @@ class TestPostgresExerciseRepository:
         mock_model.id = sample_exercise.id
         mock_model.name = sample_exercise.name
         mock_model.muscle_group = sample_exercise.muscle_group.value
+        mock_model.equipment = sample_exercise.equipment
+        mock_model.movement_pattern = sample_exercise.movement_pattern
         mock_model.description = sample_exercise.description
 
         mock_result = MagicMock()
@@ -38,6 +40,8 @@ class TestPostgresExerciseRepository:
         assert exercise is not None
         assert exercise.name == sample_exercise.name
         assert exercise.muscle_group == sample_exercise.muscle_group
+        assert exercise.equipment == sample_exercise.equipment
+        assert exercise.movement_pattern == sample_exercise.movement_pattern
         mock_session.execute.assert_called_once()
 
     async def test_get_by_not_found(self, exercise_repository: PostgresExerciseRepository, mock_session: AsyncSession):

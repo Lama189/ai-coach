@@ -15,17 +15,25 @@ class ExerciseService:
         self, 
         name: str, 
         muscle_group: MuscleGroup, 
+        equipment: str,
+        movement_pattern: str,
         description: str | None = None
     ) -> Exercise:
         if await self._uow.exercises.get_by(name=name):
             raise ValueError(f"Название упражнения '{name}' уже занято")
         
         embedding = await self._embedder.get_embedding(f"{name} {muscle_group}")
-        similar = await self._uow.exercises.find_familiar(embedding)
-        if similar:
-            raise ValueError(f"Такое упражнение уже существует: f{similar.name}")
+        # similar = await self._uow.exercises.find_familiar(embedding)
+        # if similar:
+        #     raise ValueError(f"Такое упражнение уже существует: {similar.name}")
         
-        exercise = Exercise(name=name, muscle_group=muscle_group, description=description)
+        exercise = Exercise(
+            name=name, 
+            muscle_group=muscle_group, 
+            equipment=equipment,
+            movement_pattern=movement_pattern,
+            description=description
+        )
 
         await self._uow.exercises.save_exercise(exercise, embedding)
         await self._uow.commit()

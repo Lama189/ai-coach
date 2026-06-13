@@ -81,6 +81,8 @@ def sample_exercise() -> Exercise:
         id=uuid4(),
         name="Bench Press",
         muscle_group=MuscleGroup.CHEST,
+        equipment="barbell",
+        movement_pattern="push",
         description="Classic chest exercise",
     )
 

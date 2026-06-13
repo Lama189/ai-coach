@@ -27,11 +27,15 @@ class TestExerciseService:
         exercise = await service.create_exercise(
             name="Bench Press",
             muscle_group=MuscleGroup.CHEST,
+            equipment="barbell",
+            movement_pattern="push",
             description="Classic chest exercise"
         )
 
         assert exercise.name == "Bench Press"
         assert exercise.muscle_group == MuscleGroup.CHEST
+        assert exercise.equipment == "barbell"
+        assert exercise.movement_pattern == "push"
         mock_uow.exercises.save_exercise.assert_called_once()
         mock_uow.commit.assert_called_once()
 
@@ -40,6 +44,8 @@ class TestExerciseService:
             id=uuid4(),
             name="Bench Press",
             muscle_group=MuscleGroup.CHEST,
+            equipment="barbell",
+            movement_pattern="push",
         )
         mock_uow.exercises.get_by.return_value = existing_exercise
 
@@ -49,6 +55,8 @@ class TestExerciseService:
             await service.create_exercise(
                 name="Bench Press",
                 muscle_group=MuscleGroup.CHEST,
+                equipment="barbell",
+                movement_pattern="push",
             )
         
         assert "уже занято" in str(exc_info.value)
@@ -62,6 +70,8 @@ class TestExerciseService:
             id=uuid4(),
             name="Bench Press",
             muscle_group=MuscleGroup.CHEST,
+            equipment="barbell",
+            movement_pattern="push",
         )
         mock_uow.exercises.find_familiar.return_value = similar_exercise
 
@@ -71,6 +81,8 @@ class TestExerciseService:
             await service.create_exercise(
                 name="Barbell Bench Press",
                 muscle_group=MuscleGroup.CHEST,
+                equipment="barbell",
+                movement_pattern="push",
             )
         
         assert "Такое упражнение уже существует" in str(exc_info.value)

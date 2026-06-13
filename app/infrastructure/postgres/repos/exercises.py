@@ -24,12 +24,9 @@ class PostgresExerciseRepository(IExerciseRepository):
 
 
     async def save_exercise(self, exercise: Exercise, embedding: list[float] | None = None) -> None:
-        stmt = select(ExerciseModel).where(
-            ExerciseModel.name.ilike(f"%{normalize(exercise.name)}%")
-        )
-
+        stmt = select(ExerciseModel).where(ExerciseModel.name.ilike(normalize(exercise.name)))
         result = await self._session.execute(stmt)
-        existing = result.scalar_one_or_none()
+        existing = result.scalars().first()
 
         if existing is None:
             model = self._to_model(exercise)
@@ -117,7 +114,9 @@ class PostgresExerciseRepository(IExerciseRepository):
         return ExerciseModel(
             id=exercise.id,
             name=exercise.name,
-            muscle_group=exercise.muscle_group.value, 
+            muscle_group=exercise.muscle_group.value,
+            equipment=exercise.equipment,
+            movement_pattern=exercise.movement_pattern,
             description=exercise.description,
         )
 
@@ -125,7 +124,9 @@ class PostgresExerciseRepository(IExerciseRepository):
     def _to_domain(self, model: ExerciseModel) -> Exercise:
         return Exercise(
             name=model.name,
-            muscle_group=MuscleGroup(model.muscle_group),  
+            muscle_group=MuscleGroup(model.muscle_group),
+            equipment=model.equipment,
+            movement_pattern=model.movement_pattern,
             id=model.id,
             description=model.description,
         )
