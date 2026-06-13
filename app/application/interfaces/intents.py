@@ -27,3 +27,16 @@ class IUserIntentRepository(ABC):
         self,
         user_id: UUID,
     ) -> list[UserIntent]: ...
+
+    @abstractmethod
+    async def update(
+        self,
+        intent_id: UUID,
+        **kwargs,
+    ) -> None: ...
+
+    @abstractmethod
+    async def delete(
+        self,
+        intent_id: UUID,
+    ) -> None: ...

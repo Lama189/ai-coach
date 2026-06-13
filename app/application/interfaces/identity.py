@@ -24,3 +24,7 @@ class IUserRepository(ABC):
     @abstractmethod
     async def exists_by(self, **kwargs) -> bool:
         ...
+
+    @abstractmethod
+    async def update_profile(self, user_id: UUID, **kwargs) -> None:
+        ...

@@ -69,3 +69,22 @@ class PostgresUserInsightRepository(IUserInsightRepository):
             )
             for m in models
         ]
+
+
+    async def update(self, insight_id: UUID, **kwargs) -> None:
+        model = await self._session.get(UserInsightModel, insight_id)
+        if model is None:
+            raise ValueError("Инсайт не найден")
+
+        for key, value in kwargs.items():
+            if hasattr(model, key):
+                setattr(model, key, value)
+
+        await self._session.flush()
+
+
+    async def delete(self, insight_id: UUID) -> None:
+        model = await self._session.get(UserInsightModel, insight_id)
+        if model:
+            await self._session.delete(model)
+            await self._session.flush()

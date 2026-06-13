@@ -1,5 +1,5 @@
 from typing import Callable, AsyncContextManager
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -55,10 +55,15 @@ class IntentService:
         importance = importance_map.get(dto.importance, importance_map["medium"])
         
         if profile.is_complete:
-            assert profile.gender is not None
-            assert profile.goal is not None
-            assert profile.experience_level is not None
+            if profile.gender is None:
+                raise ValueError("User profile has no gender")
 
+            if profile.goal is None:
+                raise ValueError("User profile has no goal")
+
+            if profile.experience_level is None:
+                raise ValueError("User profile has no experience level")
+            
             return f"""
                     Профиль пользователя:
                     - Пол: {profile.gender.value}
@@ -96,13 +101,14 @@ class IntentService:
     
 
     async def create_intent(self, dto: GenerateProgram) -> UserIntent:
-        content_embedding = await self._embedder.get_embedding(f"{dto.content}")
+        content_embedding = await self._embedder.get_embedding(dto.content)
 
         async with self._uow_factory() as uow:
             user = await uow.users.get_by(id=dto.user_id)
+
             if user is None:
                 raise UserNotFoundError()
-            
+
             insights = await uow.insights.search_by(
                 user_id=dto.user_id,
                 tags=["injury", "schedule", "preference"],
@@ -110,34 +116,48 @@ class IntentService:
 
             relevant_insights = await uow.insights.search_by(
                 user_id=dto.user_id,
-                query_embedding=content_embedding
+                query_embedding=content_embedding,
             )
 
-        all_insights = {i.id: i for i in insights + relevant_insights}.values()
+        all_insights = {
+            i.id: i
+            for i in insights + relevant_insights
+        }.values()
 
         prompt = self._build_prompt(user, all_insights, dto)
+
         structured_llm = self._llm.with_structured_output(IntentSchema)
 
-        intent = await structured_llm.ainvoke([
-            SystemMessage(content=(
-                "Ты анализируешь запрос пользователя и извлекаешь его намерение. "
-                "Отвечай строго по схеме. Не придумывай данные которых нет."
-            )),
-            HumanMessage(content=prompt),
-        ])
+        raw_intent = await structured_llm.ainvoke(
+            [
+                SystemMessage(
+                    content = ( 
+                        "Ты анализируешь запрос пользователя и извлекаешь его намерение. " 
+                        "Отвечай строго по схеме. Не придумывай данные которых нет."
+                )),
+                HumanMessage(content=prompt),
+            ]
+        )
 
-        intent_embedding = await self._embedder.get_embedding(self._build_intent_text(intent))
+        intent = IntentSchema.model_validate(raw_intent)
+
+        intent_embedding = await self._embedder.get_embedding(
+            self._build_intent_text(intent)
+        )
+
+        user_intent = UserIntent(
+            id=uuid4(),
+            user_id=dto.user_id,
+            goal=intent.goal,
+            constraints=intent.constraints,
+            focus_areas=intent.focus_areas,
+            location=intent.location,
+            context=intent.context,
+            program_id=None,  
+        )
 
         async with self._uow_factory() as uow:
-            await uow.intents.save(intent, intent_embedding)
+            await uow.intents.save(user_intent, intent_embedding)
             await uow.commit()
 
-        if isinstance(intent, dict):
-            return UserIntent.model_validate(intent)
-
-        if isinstance(intent, UserIntent):
-            return intent
-
-        raise TypeError(f"Unexpected type: {type(intent)}")
-
-
+        return user_intent

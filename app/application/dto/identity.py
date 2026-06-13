@@ -31,6 +31,16 @@ class UserProfileCreateDTO(BaseModel):
         )
 
 
+class UserProfileUpdateDTO(BaseModel):
+    gender: UserGender | None = None
+    age: int | None = Field(gt=10, lt=100, default=None)
+    height_cm: int | None = Field(gt=50, default=None)
+    weight_kg: float | None = Field(gt=20, lt=300, default=None)
+    goal: FitnessGoal | None = None
+    experience_level: ExperienceLevel | None = None
+    location: Location | None = None
+
+
 class UserCreateDTO(BaseModel):
     username: str = Field(min_length=3, max_length=40)
     phone: str = Field(min_length=5, max_length=50)

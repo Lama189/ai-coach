@@ -4,7 +4,7 @@ from app.core.security import SecurityUtils
 from app.core.extensions import UserNotFoundError, InvalidPasswordError
 from app.domain.identity.user import User, UserProfile
 from app.application.interfaces.unit_of_work import IUnitOfWork
-from app.application.dto.identity import LoginDTO
+from app.application.dto.identity import LoginDTO, UserProfileUpdateDTO
 from app.infrastructure.redis.repos.repository import RedisRepository
 from app.application.dto.tokens import TokenResponseDTO
 from app.application.dto.identity import UserCachedDTO
@@ -39,12 +39,15 @@ class UserService:
 
     async def get_user(self, user_id: UUID) -> User | None:
         return await self._uow.users.get_by(True, id=user_id)
+    
 
     async def get_user_by_telegram_id(self, telegram_id: int) -> User | None:
         return await self._uow.users.get_by(True, telegram_id=telegram_id)
+    
 
     async def check_phone(self, phone: str) -> bool:
         return await self._uow.users.exists_by(phone=phone)
+    
 
     async def update_weight(self, user_id: UUID, new_weight: float) -> User:
         user = await self._uow.users.get_by(True, id=user_id)
@@ -59,6 +62,19 @@ class UserService:
 
         await self._uow.users.save(user)
         await self._uow.commit()
+        return user
+
+    async def update_profile(self, user_id: UUID, dto: UserProfileUpdateDTO) -> User:
+        update_data = dto.model_dump(exclude_unset=True)
+        if not update_data:
+            raise ValueError("Нет данных для обновления")
+
+        await self._uow.users.update_profile(user_id, **update_data)
+        await self._uow.commit()
+
+        user = await self._uow.users.get_by(True, id=user_id)
+        if not user:
+            raise ValueError("Пользователь не найден")
         return user
     
 

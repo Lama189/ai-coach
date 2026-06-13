@@ -15,12 +15,13 @@ from app.infrastructure.postgres.repos.intents import PostgresUserIntentReposito
 
 
 class PostgresUnitOfWork(IUnitOfWork):
-    def __init__(self):
-        self._session_factory = async_session_maker
-        self._session: AsyncSession | None = None
+    def __init__(self, session: AsyncSession | None = None):
+        self._session = session
+        self._owns_session = session is None
 
     async def __aenter__(self) -> "PostgresUnitOfWork":
-        self._session = self._session_factory()
+        if self._session is None:
+            self._session = async_session_maker()
 
         self.users = PostgresUserRepository(self._session)
         self.exercises = PostgresExerciseRepository(self._session)

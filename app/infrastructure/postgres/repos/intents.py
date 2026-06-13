@@ -72,6 +72,25 @@ class PostgresUserIntentRepository(IUserIntentRepository):
         return [self._to_domain(m) for m in models]
 
 
+    async def update(self, intent_id: UUID, **kwargs) -> None:
+        model = await self._session.get(UserIntentModel, intent_id)
+        if model is None:
+            raise ValueError("Интент не найден")
+
+        for key, value in kwargs.items():
+            if hasattr(model, key):
+                setattr(model, key, value)
+
+        await self._session.flush()
+
+
+    async def delete(self, intent_id: UUID) -> None:
+        model = await self._session.get(UserIntentModel, intent_id)
+        if model:
+            await self._session.delete(model)
+            await self._session.flush()
+
+
     def _to_domain(self, model: UserIntentModel) -> UserIntent:
         return UserIntent(
             id=model.id,

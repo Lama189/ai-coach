@@ -1,4 +1,5 @@
 from uuid import UUID
+from datetime import datetime, timezone
 from sqlalchemy import select, exists
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,6 +70,27 @@ class PostgresUserRepository(IUserRepository):
         if model:
             await self._session.delete(model)
             await self._session.flush()
+
+    async def update_profile(self, user_id: UUID, **kwargs) -> None:
+        stmt = select(UserModel).where(UserModel.id == user_id).options(
+            selectinload(UserModel.profile)
+        )
+        result = await self._session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        if model is None:
+            raise ValueError("Пользователь не найден")
+
+        if model.profile is None:
+            model.profile = UserProfileModel(user_id=user_id)
+
+        for key, value in kwargs.items():
+            if hasattr(model.profile, key):
+                setattr(model.profile, key, value)
+
+        model.profile.updated_at = datetime.now(timezone.utc)
+        model.updated_at = datetime.now(timezone.utc)
+        await self._session.flush()
 
 
     def _to_domain(self, model: UserModel) -> User:
