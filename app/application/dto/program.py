@@ -57,7 +57,6 @@ class WorkoutProgramResponse(BaseModel):
 
 
 class GenerateProgram(BaseModel):
-    user_id: UUID
     content: str | None = Field(..., description="Пожелания пользователя к программе")
     importance: Literal["low", "medium", "high"] = Field(
         default="medium", 

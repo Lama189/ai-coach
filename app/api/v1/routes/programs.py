@@ -4,7 +4,7 @@ from starlette import status
 
 from app.application.services.program_service import WorkoutProgramService
 
-from app.application.dependencies import get_uow
+from app.application.dependencies import get_uow, get_current_user
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.application.dto.program import (
     WorkoutProgramCreate, 
@@ -54,7 +54,8 @@ async def create_workout_program(dto: WorkoutProgramCreate, uow: IUnitOfWork = D
                 """,
 )
 async def generate_workout_program(
-    dto: GenerateProgram, 
+    dto: GenerateProgram,
+    current_user = Depends(get_current_user),
 ):
     try:
         task_id = str(uuid4())
@@ -63,7 +64,8 @@ async def generate_workout_program(
         generate_workout_task.apply_async(
             kwargs={
                 "dto_dict": task_payload, 
-                "task_id": task_id  
+                "task_id": task_id,
+                "user_id": str(current_user.id),
             },
             task_id=task_id 
         )

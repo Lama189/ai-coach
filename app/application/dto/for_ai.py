@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 from uuid import UUID
 
+from app.domain.identity.insight import UserInsight, InsightBundle
+
 class SearchExercisesInput(BaseModel):
     query: str
     muscle_group: str | None = None
@@ -37,3 +39,19 @@ class WorkoutProgramAI(BaseModel):
 
 class SearchExercisesBatchInput(BaseModel):
     queries: list[str] = Field(..., description="Список названий упражнений для поиска")
+
+
+class PlanningContext(BaseModel):
+    age: int
+    gender: str
+    goal: str
+    experience_level: str
+
+    intent_goal: str
+    constraints: list[str]
+    focus_areas: list[str]
+    location: str
+    context: str
+
+    insights: InsightBundle
+    has_insights: bool

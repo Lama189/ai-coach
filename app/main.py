@@ -7,6 +7,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from redis import asyncio as aioredis
 
 from app.core.config import get_settings
+from app.core.logging_config import setup_logging
 from app.application.dependencies import get_embedding_service
 
 from app.api.v1.routes.users import router as users_router
@@ -32,6 +33,8 @@ async def lifespan(app: FastAPI):
         raise RuntimeError(f"Redis недоступен: {e}")
     finally:
         await client.aclose()
+
+    setup_logging()
 
     yield
 

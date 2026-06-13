@@ -10,10 +10,10 @@ from app.application.dto.program import GenerateProgram
 from app.core.extensions import UserNotFoundError
 from app.domain.identity.user import User
 from app.domain.identity.insight import UserInsight
+from app.domain.identity.intents import UserIntent
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.application.dto.intents import IntentSchema
-from app.domain.identity.intents import UserIntent
 
 
 
@@ -101,22 +101,19 @@ class IntentService:
         return " ".join(p for p in parts if p)
     
 
-    async def create_intent(self, dto: GenerateProgram) -> UserIntent:
-        content_embedding = await self._embedder.get_embedding(dto.content)
-
+    async def create_intent(
+        self,
+        dto: GenerateProgram,
+        user: User,
+        content_embedding: list[float],
+    ) -> UserIntent:
         async with self._uow_factory() as uow:
-            user = await uow.users.get_by(id=dto.user_id)
-
-            if user is None:
-                raise UserNotFoundError()
-
             insights = await uow.insights.search_by(
-                user_id=dto.user_id,
+                user_id=user.id,
                 tags=["injury", "schedule", "preference"],
             )
-
             relevant_insights = await uow.insights.search_by(
-                user_id=dto.user_id,
+                user_id=user.id,
                 query_embedding=content_embedding,
             )
 
@@ -128,18 +125,17 @@ class IntentService:
         prompt = self._build_prompt(user, all_insights, dto)
 
         structured_llm = self._llm.with_structured_output(IntentSchema)
-
         raw_intent = await structured_llm.ainvoke(
             [
                 SystemMessage(
-                    content = ( 
-                        "Ты анализируешь запрос пользователя и извлекаешь его намерение. " 
+                    content=(
+                        "Ты анализируешь запрос пользователя и извлекаешь его намерение. "
                         "Отвечай строго по схеме. Не придумывай данные которых нет."
-                )),
+                    )
+                ),
                 HumanMessage(content=prompt),
             ]
         )
-
         intent = IntentSchema.model_validate(raw_intent)
 
         intent_embedding = await self._embedder.get_embedding(
@@ -148,13 +144,13 @@ class IntentService:
 
         user_intent = UserIntent(
             id=uuid4(),
-            user_id=dto.user_id,
+            user_id=user.id,
             goal=intent.goal,
             constraints=intent.constraints,
             focus_areas=intent.focus_areas,
             location=intent.location,
             context=intent.context,
-            program_id=None,  
+            program_id=None,
         )
 
         async with self._uow_factory() as uow:

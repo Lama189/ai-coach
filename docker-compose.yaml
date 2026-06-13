@@ -116,6 +116,31 @@ services:
     networks:
       - app_network
 
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki.yml:/etc/loki/loki.yml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/loki.yml
+    networks:
+      - app_network
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    user: "0:958"
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /etc/machine-id:/etc/machine-id
+      - ./monitoring/promtail.yml:/etc/promtail/promtail.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/promtail.yml
+    networks:
+      - app_network
+
   bot:
     build:
       context: .
@@ -153,6 +178,7 @@ volumes:
   rabbitmq_data:
   worker_data:
   redis_data:
+  loki_data:
 
 networks:
   app_network:

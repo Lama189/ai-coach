@@ -4,3 +4,6 @@ class UserNotFoundError(Exception):
 
 class InvalidPasswordError(Exception):
     pass
+
+class UserProfileEmptyError(Exception):
+    pass

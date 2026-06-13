@@ -1,0 +1,1017 @@
+[
+  {
+    "name": "Push Up",
+    "movement_pattern": "push_horizontal",
+    "equipment": "bodyweight",
+    "muscle_group": "chest",
+    "description": "Bodyweight horizontal press for chest, shoulders and triceps"
+  },
+  {
+    "name": "Diamond Push Up",
+    "movement_pattern": "push_horizontal",
+    "equipment": "bodyweight",
+    "muscle_group": "triceps",
+    "description": "Narrow hand push up emphasizing the triceps"
+  },
+  {
+    "name": "Wide Push Up",
+    "movement_pattern": "push_horizontal",
+    "equipment": "bodyweight",
+    "muscle_group": "chest",
+    "description": "Wide stance push up biasing the outer chest"
+  },
+  {
+    "name": "Dumbbell Bench Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "dumbbell",
+    "muscle_group": "chest",
+    "description": "Flat press with dumbbells allowing a deep stretch"
+  },
+  {
+    "name": "Incline Dumbbell Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "dumbbell",
+    "muscle_group": "chest",
+    "description": "Inclined dumbbell press targeting the upper chest"
+  },
+  {
+    "name": "Dumbbell Floor Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "dumbbell",
+    "muscle_group": "chest",
+    "description": "Floor based dumbbell press with a shortened range"
+  },
+  {
+    "name": "Dumbbell Fly",
+    "movement_pattern": "push_horizontal",
+    "equipment": "dumbbell",
+    "muscle_group": "chest",
+    "description": "Chest isolation through horizontal adduction of the arms"
+  },
+  {
+    "name": "Bench Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "barbell",
+    "muscle_group": "chest",
+    "description": "Primary barbell press for chest strength and mass"
+  },
+  {
+    "name": "Incline Bench Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "barbell",
+    "muscle_group": "chest",
+    "description": "Inclined barbell press focused on the upper chest"
+  },
+  {
+    "name": "Decline Bench Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "barbell",
+    "muscle_group": "chest",
+    "description": "Declined barbell press loading the lower chest"
+  },
+  {
+    "name": "Close Grip Bench Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "barbell",
+    "muscle_group": "triceps",
+    "description": "Narrow grip bench press emphasizing the triceps"
+  },
+  {
+    "name": "Chest Press Machine",
+    "movement_pattern": "push_horizontal",
+    "equipment": "machine",
+    "muscle_group": "chest",
+    "description": "Guided horizontal press for stable chest training"
+  },
+  {
+    "name": "Pec Deck Machine",
+    "movement_pattern": "push_horizontal",
+    "equipment": "machine",
+    "muscle_group": "chest",
+    "description": "Machine fly isolating the pectorals"
+  },
+  {
+    "name": "Cable Chest Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "cable",
+    "muscle_group": "chest",
+    "description": "Standing cable press with constant tension"
+  },
+  {
+    "name": "Cable Fly",
+    "movement_pattern": "push_horizontal",
+    "equipment": "cable",
+    "muscle_group": "chest",
+    "description": "Cable chest isolation through arm adduction"
+  },
+  {
+    "name": "Cable Crossover",
+    "movement_pattern": "push_horizontal",
+    "equipment": "cable",
+    "muscle_group": "chest",
+    "description": "High to low cable fly squeezing the inner chest"
+  },
+  {
+    "name": "Kettlebell Floor Press",
+    "movement_pattern": "push_horizontal",
+    "equipment": "kettlebell",
+    "muscle_group": "chest",
+    "description": "Floor press with kettlebells for chest and triceps"
+  },
+  {
+    "name": "Pike Push Up",
+    "movement_pattern": "push_vertical",
+    "equipment": "bodyweight",
+    "muscle_group": "shoulders",
+    "description": "Inverted push up loading the shoulders vertically"
+  },
+  {
+    "name": "Handstand Push Up",
+    "movement_pattern": "push_vertical",
+    "equipment": "bodyweight",
+    "muscle_group": "shoulders",
+    "description": "Advanced vertical press performed in a handstand"
+  },
+  {
+    "name": "Dumbbell Shoulder Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "dumbbell",
+    "muscle_group": "shoulders",
+    "description": "Overhead dumbbell press for the deltoids"
+  },
+  {
+    "name": "Arnold Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "dumbbell",
+    "muscle_group": "shoulders",
+    "description": "Rotating dumbbell press hitting all three deltoid heads"
+  },
+  {
+    "name": "Dumbbell Push Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "dumbbell",
+    "muscle_group": "shoulders",
+    "description": "Leg driven overhead dumbbell press for power"
+  },
+  {
+    "name": "Overhead Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "barbell",
+    "muscle_group": "shoulders",
+    "description": "Standing barbell press for shoulder strength"
+  },
+  {
+    "name": "Push Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "barbell",
+    "muscle_group": "shoulders",
+    "description": "Explosive barbell overhead press using leg drive"
+  },
+  {
+    "name": "Seated Barbell Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "barbell",
+    "muscle_group": "shoulders",
+    "description": "Seated overhead barbell press with strict form"
+  },
+  {
+    "name": "Shoulder Press Machine",
+    "movement_pattern": "push_vertical",
+    "equipment": "machine",
+    "muscle_group": "shoulders",
+    "description": "Guided overhead press for stable shoulder work"
+  },
+  {
+    "name": "Cable Overhead Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "cable",
+    "muscle_group": "shoulders",
+    "description": "Overhead cable press with continuous tension"
+  },
+  {
+    "name": "Kettlebell Overhead Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "kettlebell",
+    "muscle_group": "shoulders",
+    "description": "Strict overhead kettlebell press for the shoulders"
+  },
+  {
+    "name": "Kettlebell Push Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "kettlebell",
+    "muscle_group": "shoulders",
+    "description": "Leg assisted overhead kettlebell press"
+  },
+  {
+    "name": "Kettlebell Z Press",
+    "movement_pattern": "push_vertical",
+    "equipment": "kettlebell",
+    "muscle_group": "shoulders",
+    "description": "Seated floor press demanding core and shoulder stability"
+  },
+  {
+    "name": "Inverted Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "bodyweight",
+    "muscle_group": "back",
+    "description": "Horizontal bodyweight pull under a fixed bar"
+  },
+  {
+    "name": "Dumbbell Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "dumbbell",
+    "muscle_group": "back",
+    "description": "Single arm bent over dumbbell row for the lats"
+  },
+  {
+    "name": "Chest Supported Dumbbell Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "dumbbell",
+    "muscle_group": "back",
+    "description": "Bench supported dumbbell row removing lower back strain"
+  },
+  {
+    "name": "Renegade Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "dumbbell",
+    "muscle_group": "back",
+    "description": "Plank position dumbbell row combining pull and core stability"
+  },
+  {
+    "name": "Barbell Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "barbell",
+    "muscle_group": "back",
+    "description": "Bent over barbell row for back thickness"
+  },
+  {
+    "name": "Pendlay Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "barbell",
+    "muscle_group": "back",
+    "description": "Explosive barbell row from a dead stop on the floor"
+  },
+  {
+    "name": "T Bar Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "barbell",
+    "muscle_group": "back",
+    "description": "Landmine loaded row for the mid back"
+  },
+  {
+    "name": "Seated Row Machine",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "machine",
+    "muscle_group": "back",
+    "description": "Guided horizontal pull for the mid back"
+  },
+  {
+    "name": "Chest Supported Row Machine",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "machine",
+    "muscle_group": "back",
+    "description": "Supported machine row isolating the back muscles"
+  },
+  {
+    "name": "Seated Cable Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "cable",
+    "muscle_group": "back",
+    "description": "Seated cable pull for the mid back and lats"
+  },
+  {
+    "name": "Cable Face Pull",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "cable",
+    "muscle_group": "shoulders",
+    "description": "High cable pull for rear delts and upper back"
+  },
+  {
+    "name": "Single Arm Cable Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "cable",
+    "muscle_group": "back",
+    "description": "Unilateral cable row for balanced back development"
+  },
+  {
+    "name": "Kettlebell Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "kettlebell",
+    "muscle_group": "back",
+    "description": "Single arm bent over kettlebell row"
+  },
+  {
+    "name": "Kettlebell Bent Over Row",
+    "movement_pattern": "pull_horizontal",
+    "equipment": "kettlebell",
+    "muscle_group": "back",
+    "description": "Two kettlebell bent over row for the back"
+  },
+  {
+    "name": "Pull Up",
+    "movement_pattern": "pull_vertical",
+    "equipment": "bodyweight",
+    "muscle_group": "back",
+    "description": "Overhand vertical pull for the lats and upper back"
+  },
+  {
+    "name": "Chin Up",
+    "movement_pattern": "pull_vertical",
+    "equipment": "bodyweight",
+    "muscle_group": "biceps",
+    "description": "Underhand vertical pull emphasizing the biceps"
+  },
+  {
+    "name": "Dumbbell Pullover",
+    "movement_pattern": "pull_vertical",
+    "equipment": "dumbbell",
+    "muscle_group": "back",
+    "description": "Overhead dumbbell pullover stretching the lats"
+  },
+  {
+    "name": "Lat Pulldown Machine",
+    "movement_pattern": "pull_vertical",
+    "equipment": "machine",
+    "muscle_group": "back",
+    "description": "Machine vertical pull for lat development"
+  },
+  {
+    "name": "Assisted Pull Up Machine",
+    "movement_pattern": "pull_vertical",
+    "equipment": "machine",
+    "muscle_group": "back",
+    "description": "Counterweighted pull up for building pulling strength"
+  },
+  {
+    "name": "Lat Pulldown",
+    "movement_pattern": "pull_vertical",
+    "equipment": "cable",
+    "muscle_group": "back",
+    "description": "Cable vertical pull targeting the lats"
+  },
+  {
+    "name": "Straight Arm Pulldown",
+    "movement_pattern": "pull_vertical",
+    "equipment": "cable",
+    "muscle_group": "back",
+    "description": "Straight arm cable pulldown isolating the lats"
+  },
+  {
+    "name": "Bodyweight Squat",
+    "movement_pattern": "squat",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Fundamental squat pattern using bodyweight only"
+  },
+  {
+    "name": "Jump Squat",
+    "movement_pattern": "squat",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Explosive squat with a jump for lower body power"
+  },
+  {
+    "name": "Pistol Squat",
+    "movement_pattern": "squat",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Single leg squat demanding strength and balance"
+  },
+  {
+    "name": "Goblet Squat",
+    "movement_pattern": "squat",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Front loaded squat holding a dumbbell at the chest"
+  },
+  {
+    "name": "Dumbbell Front Squat",
+    "movement_pattern": "squat",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Squat with dumbbells racked on the shoulders"
+  },
+  {
+    "name": "Back Squat",
+    "movement_pattern": "squat",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Barbell squat with the bar on the upper back"
+  },
+  {
+    "name": "Front Squat",
+    "movement_pattern": "squat",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Barbell squat with the bar in a front rack position"
+  },
+  {
+    "name": "Box Squat",
+    "movement_pattern": "squat",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Barbell squat to a box for depth and control"
+  },
+  {
+    "name": "Overhead Squat",
+    "movement_pattern": "squat",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Full squat with the barbell locked out overhead"
+  },
+  {
+    "name": "Leg Press",
+    "movement_pattern": "squat",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Machine press driving the load through the legs"
+  },
+  {
+    "name": "Hack Squat",
+    "movement_pattern": "squat",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Machine squat with a fixed path for the quads"
+  },
+  {
+    "name": "Smith Machine Squat",
+    "movement_pattern": "squat",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Guided barbell squat on the Smith machine"
+  },
+  {
+    "name": "Leg Extension",
+    "movement_pattern": "squat",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Knee extension machine isolating the quadriceps"
+  },
+  {
+    "name": "Kettlebell Goblet Squat",
+    "movement_pattern": "squat",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Front loaded squat holding a kettlebell at the chest"
+  },
+  {
+    "name": "Kettlebell Front Squat",
+    "movement_pattern": "squat",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Squat with kettlebells racked on the shoulders"
+  },
+  {
+    "name": "Kettlebell Sumo Squat",
+    "movement_pattern": "squat",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Wide stance squat with a kettlebell for inner thighs and glutes"
+  },
+  {
+    "name": "Glute Bridge",
+    "movement_pattern": "hinge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Floor hip extension activating the glutes"
+  },
+  {
+    "name": "Single Leg Glute Bridge",
+    "movement_pattern": "hinge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Unilateral hip bridge for the glutes and hamstrings"
+  },
+  {
+    "name": "Bodyweight Good Morning",
+    "movement_pattern": "hinge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Hip hinge drilling posterior chain mechanics"
+  },
+  {
+    "name": "Nordic Hamstring Curl",
+    "movement_pattern": "hinge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Eccentric hamstring curl with anchored feet"
+  },
+  {
+    "name": "Dumbbell Romanian Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Hip hinge with dumbbells loading the hamstrings"
+  },
+  {
+    "name": "Dumbbell Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Deadlift from the floor using dumbbells"
+  },
+  {
+    "name": "Dumbbell Stiff Leg Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Straight leg dumbbell hinge stretching the hamstrings"
+  },
+  {
+    "name": "Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "barbell",
+    "muscle_group": "full_body",
+    "description": "Conventional barbell pull from the floor"
+  },
+  {
+    "name": "Romanian Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Barbell hip hinge focused on the hamstrings"
+  },
+  {
+    "name": "Sumo Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "barbell",
+    "muscle_group": "full_body",
+    "description": "Wide stance barbell deadlift recruiting the inner thighs"
+  },
+  {
+    "name": "Barbell Hip Thrust",
+    "movement_pattern": "hinge",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Bench supported barbell thrust for glute strength"
+  },
+  {
+    "name": "Barbell Good Morning",
+    "movement_pattern": "hinge",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Bar on back hip hinge for the posterior chain"
+  },
+  {
+    "name": "Back Extension",
+    "movement_pattern": "hinge",
+    "equipment": "machine",
+    "muscle_group": "back",
+    "description": "Hyperextension bench movement for the lower back and glutes"
+  },
+  {
+    "name": "Machine Hip Thrust",
+    "movement_pattern": "hinge",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Guided hip thrust isolating the glutes"
+  },
+  {
+    "name": "Glute Ham Raise",
+    "movement_pattern": "hinge",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Knee flexion and hip extension for the hamstrings"
+  },
+  {
+    "name": "Seated Leg Curl",
+    "movement_pattern": "hinge",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Machine knee flexion isolating the hamstrings"
+  },
+  {
+    "name": "Cable Pull Through",
+    "movement_pattern": "hinge",
+    "equipment": "cable",
+    "muscle_group": "legs",
+    "description": "Standing cable hinge driving the glutes"
+  },
+  {
+    "name": "Cable Romanian Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "cable",
+    "muscle_group": "legs",
+    "description": "Cable hip hinge with constant tension on the hamstrings"
+  },
+  {
+    "name": "Kettlebell Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Hinge lifting a kettlebell from between the feet"
+  },
+  {
+    "name": "Kettlebell Swing",
+    "movement_pattern": "hinge",
+    "equipment": "kettlebell",
+    "muscle_group": "full_body",
+    "description": "Explosive hip hinge swinging a kettlebell to chest height"
+  },
+  {
+    "name": "Kettlebell Romanian Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Straight leg kettlebell hinge for the hamstrings"
+  },
+  {
+    "name": "Single Leg Kettlebell Deadlift",
+    "movement_pattern": "hinge",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Unilateral kettlebell hinge for balance and posterior chain"
+  },
+  {
+    "name": "Walking Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Forward stepping lunge for the quads and glutes"
+  },
+  {
+    "name": "Reverse Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Backward stepping lunge easier on the knees"
+  },
+  {
+    "name": "Bulgarian Split Squat",
+    "movement_pattern": "lunge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Rear foot elevated split squat for single leg strength"
+  },
+  {
+    "name": "Step Up",
+    "movement_pattern": "lunge",
+    "equipment": "bodyweight",
+    "muscle_group": "legs",
+    "description": "Single leg step onto a box for the quads and glutes"
+  },
+  {
+    "name": "Dumbbell Reverse Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Loaded backward lunge holding dumbbells"
+  },
+  {
+    "name": "Dumbbell Bulgarian Split Squat",
+    "movement_pattern": "lunge",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Rear foot elevated split squat with dumbbells"
+  },
+  {
+    "name": "Dumbbell Step Up",
+    "movement_pattern": "lunge",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Weighted step up onto a box with dumbbells"
+  },
+  {
+    "name": "Dumbbell Walking Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "dumbbell",
+    "muscle_group": "legs",
+    "description": "Walking lunge loaded with dumbbells"
+  },
+  {
+    "name": "Barbell Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Forward lunge with a barbell on the back"
+  },
+  {
+    "name": "Barbell Reverse Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Backward lunge with a barbell on the back"
+  },
+  {
+    "name": "Barbell Bulgarian Split Squat",
+    "movement_pattern": "lunge",
+    "equipment": "barbell",
+    "muscle_group": "legs",
+    "description": "Rear foot elevated split squat with a barbell"
+  },
+  {
+    "name": "Smith Machine Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "machine",
+    "muscle_group": "legs",
+    "description": "Guided split squat on the Smith machine"
+  },
+  {
+    "name": "Kettlebell Reverse Lunge",
+    "movement_pattern": "lunge",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Backward lunge holding kettlebells"
+  },
+  {
+    "name": "Kettlebell Step Up",
+    "movement_pattern": "lunge",
+    "equipment": "kettlebell",
+    "muscle_group": "legs",
+    "description": "Weighted step up onto a box with kettlebells"
+  },
+  {
+    "name": "Plank",
+    "movement_pattern": "core_stability",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Isometric hold bracing the entire trunk"
+  },
+  {
+    "name": "Side Plank",
+    "movement_pattern": "core_stability",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Lateral isometric hold for the obliques"
+  },
+  {
+    "name": "Hollow Hold",
+    "movement_pattern": "core_stability",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Tensioned hold training anterior core control"
+  },
+  {
+    "name": "Dead Bug",
+    "movement_pattern": "core_stability",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Contralateral limb extension with a braced spine"
+  },
+  {
+    "name": "Bird Dog",
+    "movement_pattern": "core_stability",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Quadruped limb extension for spinal stability"
+  },
+  {
+    "name": "Hanging Leg Raise",
+    "movement_pattern": "core_stability",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Hanging hip flexion for the lower abdominals"
+  },
+  {
+    "name": "Barbell Rollout",
+    "movement_pattern": "core_stability",
+    "equipment": "barbell",
+    "muscle_group": "core",
+    "description": "Loaded rollout resisting trunk extension"
+  },
+  {
+    "name": "Captains Chair Leg Raise",
+    "movement_pattern": "core_stability",
+    "equipment": "machine",
+    "muscle_group": "core",
+    "description": "Supported leg raise targeting the lower abs"
+  },
+  {
+    "name": "Cable Dead Bug",
+    "movement_pattern": "core_stability",
+    "equipment": "cable",
+    "muscle_group": "core",
+    "description": "Anti extension dead bug against cable resistance"
+  },
+  {
+    "name": "Pallof Press",
+    "movement_pattern": "core_stability",
+    "equipment": "cable",
+    "muscle_group": "core",
+    "description": "Anti rotation cable press for the obliques"
+  },
+  {
+    "name": "Dumbbell Suitcase Carry",
+    "movement_pattern": "core_stability",
+    "equipment": "dumbbell",
+    "muscle_group": "core",
+    "description": "One sided loaded carry resisting lateral flexion"
+  },
+  {
+    "name": "Kettlebell Suitcase Carry",
+    "movement_pattern": "core_stability",
+    "equipment": "kettlebell",
+    "muscle_group": "core",
+    "description": "Unilateral kettlebell carry for the obliques"
+  },
+  {
+    "name": "Farmers Carry",
+    "movement_pattern": "core_stability",
+    "equipment": "kettlebell",
+    "muscle_group": "full_body",
+    "description": "Loaded carry with kettlebells for grip and trunk stability"
+  },
+  {
+    "name": "Turkish Get Up",
+    "movement_pattern": "core_stability",
+    "equipment": "kettlebell",
+    "muscle_group": "full_body",
+    "description": "Full body sequence pressing a kettlebell from floor to standing"
+  },
+  {
+    "name": "Russian Twist",
+    "movement_pattern": "core_rotation",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Seated rotational twist for the obliques"
+  },
+  {
+    "name": "Bicycle Crunch",
+    "movement_pattern": "core_rotation",
+    "equipment": "bodyweight",
+    "muscle_group": "core",
+    "description": "Rotational crunch alternating elbow to knee"
+  },
+  {
+    "name": "Dumbbell Russian Twist",
+    "movement_pattern": "core_rotation",
+    "equipment": "dumbbell",
+    "muscle_group": "core",
+    "description": "Weighted seated rotation holding a dumbbell"
+  },
+  {
+    "name": "Dumbbell Woodchopper",
+    "movement_pattern": "core_rotation",
+    "equipment": "dumbbell",
+    "muscle_group": "core",
+    "description": "Diagonal chopping motion for rotational power"
+  },
+  {
+    "name": "Landmine Rotation",
+    "movement_pattern": "core_rotation",
+    "equipment": "barbell",
+    "muscle_group": "core",
+    "description": "Standing barbell rotation from a landmine pivot"
+  },
+  {
+    "name": "Cable Woodchopper",
+    "movement_pattern": "core_rotation",
+    "equipment": "cable",
+    "muscle_group": "core",
+    "description": "High to low cable chop training rotation"
+  },
+  {
+    "name": "Cable Rotation",
+    "movement_pattern": "core_rotation",
+    "equipment": "cable",
+    "muscle_group": "core",
+    "description": "Horizontal cable twist for the obliques"
+  },
+  {
+    "name": "Rotary Torso Machine",
+    "movement_pattern": "core_rotation",
+    "equipment": "machine",
+    "muscle_group": "core",
+    "description": "Seated machine rotation isolating the obliques"
+  },
+  {
+    "name": "Kettlebell Russian Twist",
+    "movement_pattern": "core_rotation",
+    "equipment": "kettlebell",
+    "muscle_group": "core",
+    "description": "Weighted seated rotation holding a kettlebell"
+  },
+  {
+    "name": "Kettlebell Windmill",
+    "movement_pattern": "core_rotation",
+    "equipment": "kettlebell",
+    "muscle_group": "core",
+    "description": "Overhead loaded side bend with rotation for the obliques"
+  },
+  {
+    "name": "Burpee",
+    "movement_pattern": "cardio",
+    "equipment": "bodyweight",
+    "muscle_group": "cardio",
+    "description": "Full body conditioning move combining squat, plank and jump"
+  },
+  {
+    "name": "Jumping Jack",
+    "movement_pattern": "cardio",
+    "equipment": "bodyweight",
+    "muscle_group": "cardio",
+    "description": "Rhythmic jumping movement for the heart rate"
+  },
+  {
+    "name": "High Knee",
+    "movement_pattern": "cardio",
+    "equipment": "bodyweight",
+    "muscle_group": "cardio",
+    "description": "Running in place driving the knees up for cardio"
+  },
+  {
+    "name": "Mountain Climber",
+    "movement_pattern": "cardio",
+    "equipment": "bodyweight",
+    "muscle_group": "cardio",
+    "description": "Dynamic plank driving the knees toward the chest"
+  },
+  {
+    "name": "Box Jump",
+    "movement_pattern": "cardio",
+    "equipment": "bodyweight",
+    "muscle_group": "cardio",
+    "description": "Explosive jump onto a box for lower body power"
+  },
+  {
+    "name": "Dumbbell Thruster",
+    "movement_pattern": "cardio",
+    "equipment": "dumbbell",
+    "muscle_group": "full_body",
+    "description": "Squat to overhead press chained for conditioning"
+  },
+  {
+    "name": "Dumbbell Snatch",
+    "movement_pattern": "cardio",
+    "equipment": "dumbbell",
+    "muscle_group": "full_body",
+    "description": "Single dumbbell pulled from floor to overhead in one motion"
+  },
+  {
+    "name": "Dumbbell Clean And Press",
+    "movement_pattern": "cardio",
+    "equipment": "dumbbell",
+    "muscle_group": "full_body",
+    "description": "Floor to shoulder clean followed by an overhead press"
+  },
+  {
+    "name": "Barbell Thruster",
+    "movement_pattern": "cardio",
+    "equipment": "barbell",
+    "muscle_group": "full_body",
+    "description": "Front squat into an overhead press with a barbell"
+  },
+  {
+    "name": "Barbell Clean",
+    "movement_pattern": "cardio",
+    "equipment": "barbell",
+    "muscle_group": "full_body",
+    "description": "Explosive pull of the barbell to the shoulders"
+  },
+  {
+    "name": "Rowing Machine",
+    "movement_pattern": "cardio",
+    "equipment": "machine",
+    "muscle_group": "cardio",
+    "description": "Full body cardio on the rowing ergometer"
+  },
+  {
+    "name": "Treadmill Run",
+    "movement_pattern": "cardio",
+    "equipment": "machine",
+    "muscle_group": "cardio",
+    "description": "Steady or interval running on the treadmill"
+  },
+  {
+    "name": "Stationary Bike",
+    "movement_pattern": "cardio",
+    "equipment": "machine",
+    "muscle_group": "cardio",
+    "description": "Seated cycling for low impact cardio"
+  },
+  {
+    "name": "Elliptical Trainer",
+    "movement_pattern": "cardio",
+    "equipment": "machine",
+    "muscle_group": "cardio",
+    "description": "Low impact full body cardio machine"
+  },
+  {
+    "name": "Assault Bike",
+    "movement_pattern": "cardio",
+    "equipment": "machine",
+    "muscle_group": "cardio",
+    "description": "High intensity bike using arms and legs together"
+  },
+  {
+    "name": "Kettlebell Snatch",
+    "movement_pattern": "cardio",
+    "equipment": "kettlebell",
+    "muscle_group": "full_body",
+    "description": "Single kettlebell driven from floor to overhead"
+  },
+  {
+    "name": "Kettlebell Clean And Press",
+    "movement_pattern": "cardio",
+    "equipment": "kettlebell",
+    "muscle_group": "full_body",
+    "description": "Kettlebell clean to the rack followed by an overhead press"
+  },
+  {
+    "name": "Kettlebell Thruster",
+    "movement_pattern": "cardio",
+    "equipment": "kettlebell",
+    "muscle_group": "full_body",
+    "description": "Front squat into overhead press with kettlebells"
+  }
+]

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
@@ -8,3 +9,11 @@ class UserInsight(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     content: str = Field(..., description="Текст кванта памяти о пользователе")
     tag: InsightTag
+
+
+@dataclass
+class InsightBundle:
+    hard: list[UserInsight]
+    context: list[UserInsight]
+    preferences: list[UserInsight]
+    semantic: list[UserInsight]
