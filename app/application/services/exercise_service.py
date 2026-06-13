@@ -17,7 +17,7 @@ class ExerciseService:
         muscle_group: MuscleGroup, 
         description: str | None = None
     ) -> Exercise:
-        if await self._uow.exercises.get_by_name(name):
+        if await self._uow.exercises.get_by(name=name):
             raise ValueError(f"Название упражнения '{name}' уже занято")
         
         embedding = await self._embedder.get_embedding(f"{name} {muscle_group}")
@@ -33,7 +33,7 @@ class ExerciseService:
     
 
     async def get_exercise(self, exercise_id: int) -> Exercise | None:
-        return await self._uow.exercises.get_by_id(exercise_id)
+        return await self._uow.exercises.get_by(id=exercise_id)
     
 
     async def search(
@@ -49,3 +49,10 @@ class ExerciseService:
             limit=limit,
             offset=offset
         )
+
+    async def delete_exercise(self, exercise_id: UUID) -> None:
+        exercise = await self._uow.exercises.get_by(id=exercise_id)
+        if not exercise:
+            raise ValueError("Упражнение не найдено")
+        await self._uow.exercises.delete(exercise_id)
+        await self._uow.commit()

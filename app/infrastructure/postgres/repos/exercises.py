@@ -16,6 +16,13 @@ class PostgresExerciseRepository(IExerciseRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
+    async def get_by(self, **kwargs) -> Exercise | None:
+        stmt = select(ExerciseModel).filter_by(**kwargs)
+        result = await self._session.execute(stmt)
+        model = result.scalar_one_or_none()
+        return self._to_domain(model) if model else None
+
+
     async def save_exercise(self, exercise: Exercise, embedding: list[float] | None = None) -> None:
         stmt = select(ExerciseModel).where(
             ExerciseModel.name.ilike(f"%{normalize(exercise.name)}%")
@@ -38,13 +45,6 @@ class PostgresExerciseRepository(IExerciseRepository):
                 existing.embedding = embedding
 
 
-    async def get_by_id(self, exercise_id: UUID) -> Exercise | None:
-        stmt = select(ExerciseModel).where(ExerciseModel.id == exercise_id)
-        result = await self._session.execute(stmt)
-        model = result.scalar_one_or_none()
-        return self._to_domain(model) if model else None
-    
-
     async def search(
         self,
         query: str | None = None,
@@ -66,17 +66,6 @@ class PostgresExerciseRepository(IExerciseRepository):
         models = result.scalars().all()
 
         return [self._to_domain(model) for model in models]
-    
-
-    async def get_by_name(self, name: str) -> Exercise | None:
-        stmt = select(ExerciseModel).where(
-            ExerciseModel.name.ilike(f"%{normalize(name)}%")
-        )
-
-        result = await self._session.execute(stmt)
-        model = result.scalar_one_or_none()
-
-        return self._to_domain(model) if model else None
     
 
     async def get_by_ids(self, exercise_ids: list[UUID]) -> list[Exercise]:
@@ -115,6 +104,13 @@ class PostgresExerciseRepository(IExerciseRepository):
             return None
 
         return self._to_domain(model)
+
+
+    async def delete(self, exercise_id: UUID) -> None:
+        model = await self._session.get(ExerciseModel, exercise_id)
+        if model:
+            await self._session.delete(model)
+            await self._session.flush()
 
 
     def _to_model(self, exercise: Exercise) -> ExerciseModel:

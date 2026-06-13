@@ -33,3 +33,19 @@ async def create_exercise(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
     return ExerciseResponseDTO.model_validate(exercise)
+
+
+@router.delete(
+    path="/{exercise_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_exercise(
+    exercise_id: UUID,
+    uow: IUnitOfWork = Depends(get_uow),
+    embedder: SentenceTransformerEmbeddingService = Depends(get_embedding_service)
+):
+    service = ExerciseService(uow, embedder)
+    try:
+        await service.delete_exercise(exercise_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

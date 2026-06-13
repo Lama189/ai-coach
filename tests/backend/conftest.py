@@ -5,11 +5,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 from datetime import datetime, timezone
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.domain.identity.user import User
 from app.domain.identity.user_profile import UserProfile
-from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
+from app.domain.training.exercise import Exercise
+from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel, MuscleGroup
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.postgres.repos.identity import PostgresUserRepository
+from app.infrastructure.postgres.repos.exercises import PostgresExerciseRepository
 from app.infrastructure.redis.repos.repository import RedisRepository
 
 
@@ -53,6 +57,7 @@ def sample_user(sample_user_profile: UserProfile) -> User:
 def mock_uow() -> IUnitOfWork:
     uow = AsyncMock(spec=IUnitOfWork)
     uow.users = AsyncMock(spec=PostgresUserRepository)
+    uow.exercises = AsyncMock(spec=PostgresExerciseRepository)
     uow.commit = AsyncMock()
     uow.rollback = AsyncMock()
     return uow
@@ -68,3 +73,24 @@ def mock_redis_repo() -> RedisRepository:
 def mock_user_repository():
     repo = AsyncMock(spec=PostgresUserRepository)
     return repo
+
+
+@pytest.fixture
+def sample_exercise() -> Exercise:
+    return Exercise(
+        id=uuid4(),
+        name="Bench Press",
+        muscle_group=MuscleGroup.CHEST,
+        description="Classic chest exercise",
+    )
+
+
+@pytest.fixture
+def mock_exercise_repository():
+    repo = AsyncMock(spec=PostgresExerciseRepository)
+    return repo
+
+
+@pytest.fixture
+def mock_exercise_session():
+    return AsyncMock(spec=AsyncSession)

@@ -177,7 +177,7 @@ class AIService:
 
             async with self._uow_factory() as uow:
                 for ex in exercises:
-                    existing = await uow.exercises.get_by_name(ex.name)
+                    existing = await uow.exercises.get_by(name=ex.name)
                     if existing:
                         results.append(f"id={existing.id} | name={existing.name}")
                         continue

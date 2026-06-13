@@ -12,11 +12,7 @@ class IExerciseRepository(ABC):
         ...
 
     @abstractmethod
-    async def get_by_id(self, exercise_id: UUID) -> Exercise | None:
-        ...
-
-    @abstractmethod
-    async def get_by_name(self, name: str) -> Exercise | None:
+    async def get_by(self, **kwargs) -> Exercise | None:
         ...
 
     @abstractmethod
@@ -38,4 +34,8 @@ class IExerciseRepository(ABC):
 
     @abstractmethod
     async def get_by_ids(self, exercise_ids: list[UUID]) -> list[Exercise]:
+        ...
+
+    @abstractmethod
+    async def delete(self, exercise_id: UUID) -> None:
         ...
