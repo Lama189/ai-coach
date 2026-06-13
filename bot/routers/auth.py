@@ -124,6 +124,12 @@ async def handle_full_name(
             password=data["password"],
             api_client=api_client,
         )
+        await login_user(
+            telegram_id=message.from_user.id,
+            phone=data["phone"],
+            password=data["password"],
+            api_client=api_client,
+        )
         await state.clear()
         await message.answer(
             "Регистрация завершена! 🎉\n\n"

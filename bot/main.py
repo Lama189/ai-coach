@@ -10,6 +10,7 @@ from bot.infrastructure.redis.repository import BotRedisRepository
 
 from bot.routers.start import router as start_router
 from bot.routers.auth import router as auth_router
+from bot.routers.insight import router as insight_router
 
 
 settings = get_settings()
@@ -24,7 +25,7 @@ async def on_shutdown(bot: Bot, redis: Redis) -> None:
 
 
 async def main():
-    redis = Redis(host=settings.redis_host, port=settings.redis_port, db=settings.redis_db)
+    redis = Redis(host=settings.redis_host, port=settings.redis_port, db=settings.redis_db, decode_responses=True)
     redis_repo = BotRedisRepository(redis)
 
     try:
@@ -48,6 +49,7 @@ async def main():
 
     dp.include_router(start_router)
     dp.include_router(auth_router)
+    dp.include_router(insight_router)
 
     await dp.start_polling(bot)
 

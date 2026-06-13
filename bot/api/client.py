@@ -101,5 +101,59 @@ class APIClient:
 
         return response_data
 
-        
+
+    async def _refresh_access_token(self, telegram_id: int) -> str | None:
+        refresh_token = await self._redis.get_refresh_token(telegram_id)
+        if not refresh_token:
+            return None
+
+        try:
+            response = await self._client.post(
+                "/api/v1/users/refresh",
+                json={"refresh_token": refresh_token},
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            return None
+
+        data = response.json()
+        await self._redis.set_access_token(telegram_id, data["access_token"])
+        await self._redis.set_refresh_token(telegram_id, data["refresh_token"])
+        return data["access_token"]
+
+
+    async def create_insight(
+        self, telegram_id: int, tag: str, content: str
+    ) -> dict:
+        token = await self._redis.get_access_token(telegram_id)
+        if not token:
+            raise ValueError("Токен доступа не найден. Выполните /auth")
+
+        try:
+            response = await self._request_with_retry(
+                "POST",
+                "/api/v1/insights/",
+                json={"tag": tag, "content": content},
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            return response.json()
+
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code != 401:
+                raise
+
+            new_token = await self._refresh_access_token(telegram_id)
+            if not new_token:
+                raise ValueError("Сессия истекла. Выполните /auth")
+
+            try:
+                response = await self._request_with_retry(
+                    "POST",
+                    "/api/v1/insights/",
+                    json={"tag": tag, "content": content},
+                    headers={"Authorization": f"Bearer {new_token}"},
+                )
+                return response.json()
+            except httpx.HTTPStatusError:
+                raise ValueError("Не удалось создать инсайт после обновления токена")
 
