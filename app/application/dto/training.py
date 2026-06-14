@@ -1,12 +1,12 @@
 from pydantic import BaseModel, UUID4, Field, ConfigDict
-from app.domain.enums import MuscleGroup
+from app.domain.enums import MuscleGroup, MovementPattern
 
 
 class CreateExerciseDTO(BaseModel):
     name: str = Field(max_length=100, min_length=3)
     muscle_group: MuscleGroup
     equipment: str = Field(max_length=50)
-    movement_pattern: str = Field(max_length=50)
+    movement_patterns: list[MovementPattern]
     description: str | None = None
 
 
@@ -15,7 +15,7 @@ class ExerciseResponseDTO(BaseModel):
     name: str
     muscle_group: MuscleGroup
     equipment: str
-    movement_pattern: str
+    movement_patterns: list[str]
     description: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

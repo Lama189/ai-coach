@@ -33,7 +33,7 @@ async def create_exercise(
             name=dto.name,
             muscle_group=dto.muscle_group,
             equipment=dto.equipment,
-            movement_pattern=dto.movement_pattern,
+            movement_patterns=dto.movement_patterns,
             description=dto.description
         )
     except ValueError as e:

@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.domain.training.exercise import Exercise
-from app.domain.enums import MuscleGroup
+from app.domain.enums import MuscleGroup, MovementPattern
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 
@@ -16,7 +16,7 @@ class ExerciseService:
         name: str, 
         muscle_group: MuscleGroup, 
         equipment: str,
-        movement_pattern: str,
+        movement_patterns: list[MovementPattern],
         description: str | None = None
     ) -> Exercise:
         if await self._uow.exercises.get_by(name=name):
@@ -31,7 +31,7 @@ class ExerciseService:
             name=name, 
             muscle_group=muscle_group, 
             equipment=equipment,
-            movement_pattern=movement_pattern,
+            movement_patterns=movement_patterns,
             description=description
         )
 

@@ -10,6 +10,7 @@ from app.infrastructure.postgres.unit_of_work import PostgresUnitOfWork
 from app.application.services.intent_service import IntentService
 from app.application.services.exercise_service import ExerciseService
 from app.application.ai.workout_context_builder import WorkoutContextBuilder
+from app.application.ai.exercise_retriever import ExerciseRetriever
 from app.application.dto.program import GenerateProgram
 from app.application.dependencies import get_embedding_service, get_llm_api_key
 from app.application.dto.training import CreateExerciseDTO
@@ -36,20 +37,35 @@ async def _run_generation(dto: GenerateProgram, task_uuid: UUID, user_id: UUID):
         api_key=api_key,
     )
     context_builder = WorkoutContextBuilder(uow_factory=uow_factory)
+    exercise_retriever = ExerciseRetriever(uow_factory=uow_factory)
 
     try:
         content_embedding = await embedder.get_embedding(dto.content)
 
         async with uow_factory() as uow:
             user = await uow.users.get_by(id=user_id, with_relations=True)
-
-        if user is None:
-            raise UserNotFoundError()
+            if user is None:
+                raise UserNotFoundError()
 
         intent = await intent_service.create_intent(dto, user, content_embedding)
         context = await context_builder.build(user, intent, content_embedding)
 
-        return context
+        intent_embedding = await embedder.get_embedding(
+            " ".join([
+                intent.goal,
+                intent.location.value,
+                " ".join(f.value for f in intent.focus_areas),
+                intent.context,
+            ])
+        )
+
+        exercise_bundle = await exercise_retriever.retrieve(
+            context=context,
+            embedding=intent_embedding,
+        )
+
+        return context, exercise_bundle
+
     finally:
         await worker_engine.dispose()
 
@@ -69,7 +85,7 @@ async def _run_exercises(dto_list: list[dict]):
                     name=dto.name,
                     muscle_group=dto.muscle_group,
                     equipment=dto.equipment,
-                    movement_pattern=dto.movement_pattern,
+                    movement_patterns=dto.movement_patterns,
                     description=dto.description,
                 )
     finally:

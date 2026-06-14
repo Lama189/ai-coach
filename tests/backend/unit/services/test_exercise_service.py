@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 from app.domain.training.exercise import Exercise
-from app.domain.enums import MuscleGroup
+from app.domain.enums import MuscleGroup, MovementPattern
 from app.application.services.exercise_service import ExerciseService
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
@@ -28,14 +28,14 @@ class TestExerciseService:
             name="Bench Press",
             muscle_group=MuscleGroup.CHEST,
             equipment="barbell",
-            movement_pattern="push",
+            movement_patterns=[MovementPattern.PUSH_HORIZONTAL],
             description="Classic chest exercise"
         )
 
         assert exercise.name == "Bench Press"
         assert exercise.muscle_group == MuscleGroup.CHEST
         assert exercise.equipment == "barbell"
-        assert exercise.movement_pattern == "push"
+        assert exercise.movement_patterns == [MovementPattern.PUSH_HORIZONTAL]
         mock_uow.exercises.save_exercise.assert_called_once()
         mock_uow.commit.assert_called_once()
 
@@ -45,7 +45,7 @@ class TestExerciseService:
             name="Bench Press",
             muscle_group=MuscleGroup.CHEST,
             equipment="barbell",
-            movement_pattern="push",
+            movement_patterns=[MovementPattern.PUSH_HORIZONTAL],
         )
         mock_uow.exercises.get_by.return_value = existing_exercise
 
@@ -56,7 +56,7 @@ class TestExerciseService:
                 name="Bench Press",
                 muscle_group=MuscleGroup.CHEST,
                 equipment="barbell",
-                movement_pattern="push",
+                movement_patterns=[MovementPattern.PUSH_HORIZONTAL],
             )
         
         assert "уже занято" in str(exc_info.value)
@@ -64,6 +64,7 @@ class TestExerciseService:
 
     async def test_create_exercise_similar_exists(self, mock_uow: IUnitOfWork, mock_embedder: SentenceTransformerEmbeddingService):
         mock_uow.exercises.get_by.return_value = None
+        mock_uow.exercises.save_exercise = AsyncMock()
         mock_embedder.get_embedding.return_value = [0.1] * 384
 
         similar_exercise = Exercise(
@@ -71,22 +72,22 @@ class TestExerciseService:
             name="Bench Press",
             muscle_group=MuscleGroup.CHEST,
             equipment="barbell",
-            movement_pattern="push",
+            movement_patterns=[MovementPattern.PUSH_HORIZONTAL],
         )
         mock_uow.exercises.find_familiar.return_value = similar_exercise
 
         service = ExerciseService(mock_uow, mock_embedder)
 
-        with pytest.raises(ValueError) as exc_info:
-            await service.create_exercise(
-                name="Barbell Bench Press",
-                muscle_group=MuscleGroup.CHEST,
-                equipment="barbell",
-                movement_pattern="push",
-            )
-        
-        assert "Такое упражнение уже существует" in str(exc_info.value)
-        mock_uow.exercises.save_exercise.assert_not_called()
+        exercise = await service.create_exercise(
+            name="Barbell Bench Press",
+            muscle_group=MuscleGroup.CHEST,
+            equipment="barbell",
+            movement_patterns=[MovementPattern.PUSH_HORIZONTAL],
+        )
+
+        assert exercise.name == "Barbell Bench Press"
+        mock_uow.exercises.save_exercise.assert_called_once()
+        mock_uow.commit.assert_called_once()
 
     async def test_get_exercise_found(self, mock_uow: IUnitOfWork, mock_embedder: SentenceTransformerEmbeddingService, sample_exercise: Exercise):
         mock_uow.exercises.get_by.return_value = sample_exercise

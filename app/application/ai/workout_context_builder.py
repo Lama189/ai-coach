@@ -197,9 +197,9 @@ class WorkoutContextBuilder:
             experience_level=profile.experience_level.value,
 
             intent_goal=intent.goal,
-            constraints=intent.constraints,
+            constraints=[c.value for c in intent.constraints],
             focus_areas=[f.value for f in intent.focus_areas],
-            location=profile.location or "unknown",
+            location=intent.location.value,
             context=intent.context,
 
             insights=bundle,

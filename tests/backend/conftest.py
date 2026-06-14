@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.identity.user import User
 from app.domain.identity.user_profile import UserProfile
 from app.domain.training.exercise import Exercise
-from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel, MuscleGroup
+from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel, MuscleGroup, MovementPattern
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.postgres.repos.identity import PostgresUserRepository
 from app.infrastructure.postgres.repos.exercises import PostgresExerciseRepository
@@ -82,7 +82,7 @@ def sample_exercise() -> Exercise:
         name="Bench Press",
         muscle_group=MuscleGroup.CHEST,
         equipment="barbell",
-        movement_pattern="push",
+        movement_patterns=[MovementPattern.PUSH_HORIZONTAL],
         description="Classic chest exercise",
     )
 

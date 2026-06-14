@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from uuid import UUID
 
+from app.domain.enums import MovementPattern
 from app.domain.identity.insight import UserInsight, InsightBundle
 
 class SearchExercisesInput(BaseModel):
@@ -12,7 +13,7 @@ class CreateExerciseInput(BaseModel):
     name: str = Field(..., description="Название упражнения")
     muscle_group: str = Field(..., description="Группа мышц: chest, back, legs, shoulders, biceps, triceps, core, full_body, cardio")
     equipment: str = Field(..., description="Оборудование: barbell, dumbbell, machine, bodyweight, cable, kettlebell")
-    movement_pattern: str = Field(..., description="Тип движения: push, pull, squat, hinge, rotation, carry, isolation")
+    movement_patterns: list[MovementPattern] = Field(..., description="Типы движения: push_horizontal, push_vertical, pull_horizontal, pull_vertical, squat, hinge, lunge, carry, core")
     description: str | None = Field(None, description="Описание упражнения")
 
 
@@ -55,3 +56,16 @@ class PlanningContext(BaseModel):
 
     insights: InsightBundle
     has_insights: bool
+
+
+class CandidateExercise(BaseModel):
+    id: UUID
+    name: str
+    muscle_group: str
+    equipment: str
+    movement_patterns: list[str]
+    description: str | None = None
+
+
+class ExerciseBundle(BaseModel):
+    exercises: list[CandidateExercise]

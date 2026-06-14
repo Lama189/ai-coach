@@ -11,9 +11,11 @@ class IExerciseRepository(ABC):
     async def save_exercise(self, exercise: Exercise, embedding: list[float] | None = None) -> None:
         ...
 
+
     @abstractmethod
     async def get_by(self, **kwargs) -> Exercise | None:
         ...
+
 
     @abstractmethod
     async def search(
@@ -25,6 +27,18 @@ class IExerciseRepository(ABC):
     ) -> list[Exercise]:
         ...
 
+
+    @abstractmethod
+    async def search_relevant(
+        self,
+        muscle_groups: list[str],
+        excluded_patterns: list[str],
+        excluded_equipment: list[str],
+        embedding: list[float] | None,
+        limit: int,
+    ) -> list[Exercise]: ...
+
+
     async def find_familiar(
         self,
         embedding: list[float],
@@ -32,9 +46,11 @@ class IExerciseRepository(ABC):
     ) -> Exercise | None:
         ...
 
+
     @abstractmethod
     async def get_by_ids(self, exercise_ids: list[UUID]) -> list[Exercise]:
         ...
+
 
     @abstractmethod
     async def delete(self, exercise_id: UUID) -> None:

@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.training.exercise import Exercise
-from app.domain.enums import MuscleGroup
+from app.domain.enums import MuscleGroup, MovementPattern
 from app.application.interfaces.exercises import IExerciseRepository
 from app.infrastructure.postgres.models.exercises import Exercise as ExerciseModel
 
@@ -109,6 +109,44 @@ class PostgresExerciseRepository(IExerciseRepository):
             await self._session.delete(model)
             await self._session.flush()
 
+    
+    async def search_relevant(
+        self,
+        muscle_groups: list[str],
+        excluded_patterns: list[str],
+        excluded_equipment: list[str],
+        embedding: list[float] | None,
+        limit: int,
+    ) -> list[Exercise]:
+
+        stmt = select(ExerciseModel).where(
+            ExerciseModel.muscle_group.in_(muscle_groups)
+        )
+
+        if excluded_patterns:
+            stmt = stmt.where(
+                ~ExerciseModel.movement_patterns.op("&&")(excluded_patterns)
+            )
+
+        if excluded_equipment:
+            stmt = stmt.where(
+                ExerciseModel.equipment.notin_(excluded_equipment)
+            )
+
+        if embedding:
+            stmt = stmt.order_by(
+                ExerciseModel.embedding.cosine_distance(embedding)
+            )
+        else:
+            stmt = stmt.order_by(ExerciseModel.muscle_group)
+
+        stmt = stmt.limit(limit)
+
+        result = await self._session.execute(stmt)
+        models = result.scalars().all()
+
+        return [self._to_domain(model) for model in models]
+
 
     def _to_model(self, exercise: Exercise) -> ExerciseModel:
         return ExerciseModel(
@@ -116,7 +154,7 @@ class PostgresExerciseRepository(IExerciseRepository):
             name=exercise.name,
             muscle_group=exercise.muscle_group.value,
             equipment=exercise.equipment,
-            movement_pattern=exercise.movement_pattern,
+            movement_patterns=[p.value for p in exercise.movement_patterns],
             description=exercise.description,
         )
 
@@ -126,7 +164,7 @@ class PostgresExerciseRepository(IExerciseRepository):
             name=model.name,
             muscle_group=MuscleGroup(model.muscle_group),
             equipment=model.equipment,
-            movement_pattern=model.movement_pattern,
+            movement_patterns=[MovementPattern(p) for p in model.movement_patterns],
             id=model.id,
             description=model.description,
         )

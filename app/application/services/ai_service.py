@@ -23,6 +23,7 @@ from app.application.dto.for_ai import (
     CreateExerciseInput,
     WorkoutProgramAI,
 )
+from app.domain.enums import MovementPattern
 from app.application.dto.program import (
     WorkoutProgramResponse,
     WorkoutDayResponse,
@@ -192,7 +193,7 @@ class AIService:
                         name=ex.name,
                         muscle_group=MuscleGroup(ex.muscle_group.lower()),
                         equipment=ex.equipment,
-                        movement_pattern=ex.movement_pattern,
+                        movement_patterns=[MovementPattern(p) for p in ex.movement_patterns],
                         description=ex.description,
                     )
                     await uow.exercises.save_exercise(exercise, embedding)
