@@ -57,7 +57,7 @@ class WorkoutProgramResponse(BaseModel):
 
 
 class GenerateProgram(BaseModel):
-    content: str | None = Field(..., description="Пожелания пользователя к программе")
+    content: str | None = Field(None, description="Пожелания пользователя к программе")
     importance: Literal["low", "medium", "high"] = Field(
         default="medium", 
         description="Насколько строго учитывать пожелания"

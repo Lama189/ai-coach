@@ -25,7 +25,7 @@ class WorkoutDayExerciseAI(BaseModel):
     exercise_id: UUID = Field(..., description="UUID упражнения из базы данных")
     sets: int = Field(..., description="Количество подходов")
     reps: int = Field(..., description="Количество повторений")
-    rest_seconds: int = Field(..., description="Время отдыха в секундах")
+    rest_seconds: int | None = Field(None, description="Время отдыха в секундах")
 
 class WorkoutDayAI(BaseModel):
     day_number: int = Field(..., description="Порядковый номер дня, начиная с 1")

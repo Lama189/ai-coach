@@ -1,13 +1,11 @@
 from typing import Callable, AsyncContextManager
-from uuid import UUID, uuid4
+from uuid import uuid4
 
-from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from app.application.dto.program import GenerateProgram
 
-from app.core.extensions import UserNotFoundError
 from app.domain.identity.user import User
 from app.domain.identity.insight import UserInsight
 from app.domain.identity.intents import UserIntent

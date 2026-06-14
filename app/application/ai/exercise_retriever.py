@@ -57,9 +57,9 @@ class ExerciseRetriever:
                 CandidateExercise(
                     id=e.id,
                     name=e.name,
-                    muscle_group=e.muscle_group,
+                    muscle_group=e.muscle_group.value,
                     equipment=e.equipment,
-                    movement_patterns=e.movement_patterns,
+                    movement_patterns=[p.value for p in e.movement_patterns],
                     description=e.description,
                 )
                 for e in exercises
