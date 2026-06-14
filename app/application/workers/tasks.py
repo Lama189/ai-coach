@@ -103,6 +103,8 @@ async def _run_generation(
             embedding=intent_embedding,
         )
 
+        exercise_names = {e.id: e.name for e in exercise_bundle.exercises}
+
         program_ai = await generator.generate(
             user_id=user_id,
             context=context,
@@ -150,7 +152,8 @@ async def _run_generation(
             await uow.commit()
 
         return generator.map_to_response(
-            domain_program
+            domain_program,
+            exercise_names=exercise_names,
         )
 
     finally:

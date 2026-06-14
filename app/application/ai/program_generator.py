@@ -282,7 +282,11 @@ class WorkoutProgramGenerator:
         return program
 
 
-    def map_to_response(self, program: WorkoutProgram) -> WorkoutProgramResponse:
+    def map_to_response(
+        self,
+        program: WorkoutProgram,
+        exercise_names: dict[UUID, str] | None = None,
+    ) -> WorkoutProgramResponse:
         return WorkoutProgramResponse(
             id=program.id,
             user_id=program.user_id,
@@ -298,6 +302,7 @@ class WorkoutProgramGenerator:
                         WorkoutDayExerciseResponse(
                             id=exercise.id,
                             exercise_id=exercise.exercise_id,
+                            exercise_name=exercise_names.get(exercise.exercise_id) if exercise_names else None,
                             sets=exercise.sets,
                             reps=exercise.reps,
                             rest_seconds=exercise.rest_seconds,

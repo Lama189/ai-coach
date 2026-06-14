@@ -26,6 +26,7 @@ class WorkoutProgramCreate(BaseModel):
 class WorkoutDayExerciseResponse(BaseModel):
     id: UUID = Field(..., description="Уникальный ID связи упражнения с днем")
     exercise_id: UUID = Field(..., description="ID самого упражнения из справочника")
+    exercise_name: str | None = Field(None, description="Название упражнения")
     sets: int = Field(..., description="Количество подходов")
     reps: int = Field(..., description="Количество повторений")
     rest_seconds: int | None = Field(None, description="Время отдыха в секундах")

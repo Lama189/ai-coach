@@ -4,7 +4,7 @@ from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.domain.training.program import WorkoutProgram
 from app.domain.training.workout_day import WorkoutDay
 from app.domain.training.workout_day_exercise import WorkoutDayExercise
-from app.application.dto.program import WorkoutProgramCreate
+from app.application.dto.program import WorkoutProgramCreate, WorkoutProgramResponse, WorkoutDayResponse, WorkoutDayExerciseResponse
 
 
 class WorkoutProgramService:
@@ -57,7 +57,7 @@ class WorkoutProgramService:
         return program
 
 
-    async def get_actual_program_for_user(self, user_id: UUID) -> WorkoutProgram:
+    async def get_actual_program_for_user(self, user_id: UUID) -> WorkoutProgramResponse:
         existing_program = await self._uow.programs.get_actual_by_user_id(user_id)
         if existing_program is None:
             raise ValueError("Для данного пользователя нет программ тренировок")
@@ -66,14 +66,43 @@ class WorkoutProgramService:
         if not days:
             raise ValueError("Для данной программы отсутствуют тренировочные дни")
 
+        all_exercise_ids = set()
+        day_exercises_map: dict[UUID, list] = {}
+
         for day in days:
-            existing_program.add_day(day)
-
             exercises = await self._uow.workout_days_exercise.get_by_workout_day_id(day.id)
-            if not exercises:
-                continue
-            
+            day_exercises_map[day.id] = exercises
             for ex in exercises:
-                day.add_exercise(ex)
+                all_exercise_ids.add(ex.exercise_id)
 
-        return existing_program
+        exercise_names: dict[UUID, str] = {}
+        if all_exercise_ids:
+            exercises = await self._uow.exercises.get_by_ids(list(all_exercise_ids))
+            exercise_names = {e.id: e.name for e in exercises}
+
+        return WorkoutProgramResponse(
+            id=existing_program.id,
+            user_id=existing_program.user_id,
+            name=existing_program.name,
+            description=existing_program.description,
+            is_active=existing_program.is_active,
+            workout_days=[
+                WorkoutDayResponse(
+                    id=day.id,
+                    day_number=day.day_number,
+                    title=day.title,
+                    exercises=[
+                        WorkoutDayExerciseResponse(
+                            id=ex.id,
+                            exercise_id=ex.exercise_id,
+                            exercise_name=exercise_names.get(ex.exercise_id),
+                            sets=ex.sets,
+                            reps=ex.reps,
+                            rest_seconds=ex.rest_seconds,
+                        )
+                        for ex in day_exercises_map[day.id]
+                    ],
+                )
+                for day in days
+            ],
+        )

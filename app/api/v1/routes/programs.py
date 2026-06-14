@@ -89,8 +89,7 @@ async def generate_workout_program(
 async def get_program_by_user_id(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)):
     service = WorkoutProgramService(uow)
     try:
-        program = await service.get_actual_program_for_user(user_id)
-        return WorkoutProgramResponse.model_validate(program)
+        return await service.get_actual_program_for_user(user_id)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
