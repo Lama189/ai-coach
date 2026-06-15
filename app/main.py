@@ -15,6 +15,8 @@ from app.api.v1.routes.exercises import router as exercises_router
 from app.api.v1.routes.programs import router as programs_router
 from app.api.v1.routes.insights import router as insights_router
 
+from app.api.v1.middlewares.req_id import RequestIDMiddleware
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,6 +46,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(RequestIDMiddleware)
 Instrumentator().instrument(app).expose(app)
 
 

@@ -3,6 +3,7 @@ import logging
 from uuid import UUID
 from typing import Callable, AsyncContextManager
 
+from app.infrastructure.logging.decorators import log_duration
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.application.dto.for_ai import PlanningContext
 from app.domain.identity.intents import UserIntent
@@ -21,7 +22,7 @@ class WorkoutContextBuilder:
     ) -> None:
         self._uow_factory = uow_factory
 
-
+    @log_duration
     async def _load_relevant_insights(
         self,
         user_id: UUID,
@@ -31,52 +32,23 @@ class WorkoutContextBuilder:
         start = time.time()
 
         async with self._uow_factory() as uow:
-
-            logger.info(
-                "insights_retrieval_started",
-                extra={"user_id": str(user_id)}
-            )
-
             hard = await uow.insights.search_by(
                 user_id=user_id,
                 tags=[InsightTag.injury, InsightTag.fatigue],
                 limit=5
             )
 
-            logger.info(
-                "insights_hard_loaded",
-                extra={
-                    "user_id": str(user_id),
-                    "count": len(hard)
-                }
-            )
-
+            
             context = await uow.insights.search_by(
                 user_id=user_id,
                 tags=[InsightTag.schedule, InsightTag.mental],
                 limit=3
             )
 
-            logger.info(
-                "insights_context_loaded",
-                extra={
-                    "user_id": str(user_id),
-                    "count": len(context)
-                }
-            )
-
             prefs = await uow.insights.search_by(
                 user_id=user_id,
                 tags=[InsightTag.preference, InsightTag.technique],
                 limit=5
-            )
-
-            logger.info(
-                "insights_prefs_loaded",
-                extra={
-                    "user_id": str(user_id),
-                    "count": len(prefs)
-                }
             )
 
             semantic = []
@@ -87,25 +59,8 @@ class WorkoutContextBuilder:
                     limit=5
                 )
 
-                logger.info(
-                    "insights_semantic_loaded",
-                    extra={
-                        "user_id": str(user_id),
-                        "count": len(semantic)
-                    }
-                )
-
             duration_ms = int((time.time() - start) * 1000)
             total_count = len(hard) + len(context) + len(prefs) + len(semantic)
-
-            logger.info(
-                "insights_retrieval_finished",
-                extra={
-                    "user_id": str(user_id),
-                    "total": total_count,
-                    "duration_ms": duration_ms
-                }
-            )
 
             return hard, context, prefs, semantic
 
@@ -118,11 +73,6 @@ class WorkoutContextBuilder:
     ) -> PlanningContext:
 
         start = time.time()
-
-        logger.info(
-            "context_build_started",
-            extra={"user_id": str(user.id)}
-        )
 
         hard, context_insights, prefs, semantic = await self._load_relevant_insights(
             user_id=user.id,
@@ -145,15 +95,6 @@ class WorkoutContextBuilder:
 
         if profile.experience_level is None:
             raise ValueError("User profile has no experience level")
-
-        logger.info(
-            "profile_validated",
-            extra={
-                "user_id": str(user.id),
-                "goal": profile.goal.value,
-                "experience": profile.experience_level.value,
-            }
-        )
 
         seen_ids = set()
         
@@ -204,16 +145,6 @@ class WorkoutContextBuilder:
 
             insights=bundle,
             has_insights=has_insights,
-        )
-
-        logger.info(
-            "context_build_finished",
-            extra={
-                "user_id": str(user.id),
-                "has_insights": has_insights,
-                "insights_count": len(seen_ids),
-                "duration_ms": int((time.time() - start) * 1000)
-            }
         )
 
         return context_dto
