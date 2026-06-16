@@ -1,6 +1,6 @@
 from prometheus_client import Counter, Histogram, Gauge
 
-hhtp_requests_total = Counter(
+http_requests_total = Counter(
     "http_requests_total",
     "Общее количество HTTP запросов",
     ["method", "endpoint", "statuscode"]

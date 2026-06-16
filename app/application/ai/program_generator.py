@@ -1,6 +1,6 @@
 import logging
 from uuid import UUID
-from typing import Callable, AsyncContextManager, cast
+from typing import cast
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -13,11 +13,14 @@ from app.application.dto.for_ai import (
     WorkoutProgramAI,
 )
 
+from app.application.ai.validator import WorkoutProgramValidator, ValidationError
 from app.application.dto.program import (
     WorkoutProgramResponse,
     WorkoutDayResponse,
     WorkoutDayExerciseResponse,
 )
+from app.infrastructure.logging.decorators import log_duration
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,18 +30,20 @@ class WorkoutProgramGenerator:
         self,
         api_key: str,
     ) -> None:
+        self._validator = WorkoutProgramValidator()
         self._llm = ChatGoogleGenerativeAI(
             google_api_key=api_key,
             model="gemini-3.5-flash",
             temperature=0.2
         )
 
-    
+    @log_duration
     async def generate(
         self,
         user_id: UUID,
         context: PlanningContext,
         exercises: ExerciseBundle,
+        appends_count: int = 2
     ) -> WorkoutProgramAI:
 
         structured_llm = self._llm.with_structured_output(
@@ -46,34 +51,19 @@ class WorkoutProgramGenerator:
             method="json_mode",
         )
 
-        prompt = self._build_prompt(
-            context=context,
-            exercises=exercises,
-        )
+        prompt = self._build_prompt(context=context, exercises=exercises)
 
-        logger.info(
-            "program_generation_started",
-            extra={
-                "exercise_count": len(exercises.exercises),
-                "goal": context.goal,
-                "experience": context.experience_level,
-            },
-        )
+        for result in range(appends_count):
+            program = await structured_llm.ainvoke(prompt)
+            result = cast(WorkoutProgramAI, program)
 
-        program = cast(
-            WorkoutProgramAI,
-            await structured_llm.ainvoke(prompt)
-        )
+            errors = self._validator.validate(result, context, exercises)
+            if not errors:
+                break
 
-        logger.info(
-            "program_generation_finished",
-            extra={
-                "days": len(program.workout_days),
-                "program_name": program.name,
-            },
-        )
 
-        return program
+        return result
+
 
     def _build_prompt(
         self,
@@ -254,6 +244,48 @@ class WorkoutProgramGenerator:
                 17. Не возвращай текст.
 
                 18. Верни только JSON.
+                """
+    
+
+    def _build_retry_prompt(
+        self,
+        original_prompt: str,
+        program: WorkoutProgramAI,
+        errors: list[ValidationError],
+    ) -> str:
+
+        errors_text = "\n".join(
+            f"- [{e.code}] {e.message})"
+            for e in errors
+        )
+
+        return f"""
+                Ты исправляешь JSON программу тренировок.
+
+                ОБЯЗАТЕЛЬНО соблюдай:
+                - используй ТОЛЬКО разрешённые упражнения
+                - не выдумывай UUID
+                - верни только JSON
+
+                ====================
+                ОРИГИНАЛЬНЫЙ ЗАПРОС
+                ====================
+                {original_prompt}
+
+                ====================
+                СГЕНЕРИРОВАННАЯ ПРОГРАММА
+                ====================
+                {program.model_dump_json(indent=2)}
+
+                ====================
+                ОШИБКИ ВАЛИДАЦИИ
+                ====================
+                {errors_text}
+
+                ====================
+                ЗАДАЧА
+                ====================
+                Исправь программу с учётом ошибок и верни корректный JSON WorkoutProgramAI.
                 """
     
     def map_to_domain(self, user_id: UUID, response: WorkoutProgramAI) -> WorkoutProgram:

@@ -61,7 +61,11 @@ async def login(
     response_model=UserResponseDTO,
     status_code=status.HTTP_200_OK
 )
-async def get_user_by_telegram_id(telegram_id: int, uow: IUnitOfWork = Depends(get_uow)):
+async def get_user_by_telegram_id(
+    telegram_id: int,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow)
+):
     service = UserService(uow)
     user = await service.get_user_by_telegram_id(telegram_id)
     if not user:
@@ -75,7 +79,11 @@ async def get_user_by_telegram_id(telegram_id: int, uow: IUnitOfWork = Depends(g
     response_model=bool,
     status_code=status.HTTP_200_OK
 )
-async def exists_by_phone(phone: str, uow: IUnitOfWork = Depends(get_uow)):
+async def exists_by_phone(
+    phone: str,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow)
+):
     service = UserService(uow)
     return await service.check_phone(phone)
 
@@ -112,7 +120,11 @@ async def logout(
     response_model=UserResponseDTO,
     status_code=status.HTTP_200_OK
 )
-async def get_user(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)):
+async def get_user(
+    user_id: UUID,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow)
+):
     service = UserService(uow)
     user = await service.get_user(user_id)
     if not user:

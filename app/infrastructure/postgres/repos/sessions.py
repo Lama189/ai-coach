@@ -34,16 +34,20 @@ class PostgresSessionsRepository(ISessionRepository):
             id=model.id,
             user_id=model.user_id,
             program_id=model.program_id,
-            status=model.status
+            status=model.status,
+            started_at=model.started_at,
+            finished_at=model.finished_at,
+            notes=model.notes,
         )
     
 
     def _to_domain(self, model: WorkoutSessionModel) -> WorkoutSessionDomain:
-        return WorkoutSessionModel(
+        return WorkoutSessionDomain(
             id=model.id,
             user_id=model.user_id,
             program_id=model.program_id,
             status=model.status,
             started_at=model.started_at,
-            finished_at=model.finished_at
+            finished_at=model.finished_at,
+            notes=model.notes,
         )

@@ -16,10 +16,10 @@ from app.core.security import SecurityUtils
 @pytest.mark.asyncio
 class TestAuthService:
     @pytest.fixture
-    def auth_service(self, mock_uow: IUnitOfWork, mock_redis_repo: RedisRepository):
-        return AuthService(mock_uow, mock_redis_repo)
+    def auth_service(self, mock_uow: IUnitOfWork, mock_redis_repository: RedisRepository):
+        return AuthService(mock_uow, mock_redis_repository)
 
-    async def test_login_success(self, auth_service: AuthService, mock_uow: IUnitOfWork, mock_redis_repo: RedisRepository, sample_user: User):
+    async def test_login_success(self, auth_service: AuthService, mock_uow: IUnitOfWork, mock_redis_repository: RedisRepository, sample_user: User):
         mock_uow.users.get_by.return_value = sample_user
 
         with patch.object(SecurityUtils, "verify_password", return_value=True), \
@@ -36,8 +36,8 @@ class TestAuthService:
 
             assert result.access_token == "access_token"
             assert result.refresh_token == "refresh_token"
-            mock_redis_repo.set_refresh_token.assert_called_once()
-            mock_redis_repo.set_user.assert_called_once()
+            mock_redis_repository.set_refresh_token.assert_called_once()
+            mock_redis_repository.set_user.assert_called_once()
 
     async def test_login_user_not_found(self, auth_service: AuthService, mock_uow: IUnitOfWork):
         mock_uow.users.get_by.return_value = None
@@ -64,11 +64,11 @@ class TestAuthService:
             with pytest.raises(InvalidPasswordError):
                 await auth_service.login(login_dto)
 
-    async def test_refresh_success(self, auth_service: AuthService, mock_redis_repo: RedisRepository):
+    async def test_refresh_success(self, auth_service: AuthService, mock_redis_repository: RedisRepository):
         user_id = str(uuid4())
         refresh_token = "valid_refresh_token"
 
-        mock_redis_repo.get_refresh_token.return_value = refresh_token
+        mock_redis_repository.get_refresh_token.return_value = refresh_token
 
         with patch.object(SecurityUtils, "verify_token", return_value={"sub": user_id, "type": "refresh"}), \
              patch.object(SecurityUtils, "generate_access_token", return_value="new_access_token"):
@@ -78,18 +78,18 @@ class TestAuthService:
             assert result.access_token == "new_access_token"
             assert result.refresh_token == refresh_token
 
-    async def test_refresh_invalid_token(self, auth_service: AuthService, mock_redis_repo: RedisRepository):
-        mock_redis_repo.get_refresh_token.return_value = None
+    async def test_refresh_invalid_token(self, auth_service: AuthService, mock_redis_repository: RedisRepository):
+        mock_redis_repository.get_refresh_token.return_value = None
 
         with pytest.raises(HTTPException) as exc_info:
             await auth_service.refresh("invalid_token")
         
         assert exc_info.value.status_code == 401
 
-    async def test_logout_success(self, auth_service: AuthService, mock_redis_repo: RedisRepository):
+    async def test_logout_success(self, auth_service: AuthService, mock_redis_repository: RedisRepository):
         user_id = str(uuid4())
 
         await auth_service.logout(user_id)
 
-        mock_redis_repo.delete_refresh_token.assert_called_once_with(user_id)
-        mock_redis_repo.delete_user.assert_called_once_with(user_id)
+        mock_redis_repository.delete_refresh_token.assert_called_once_with(user_id)
+        mock_redis_repository.delete_user.assert_called_once_with(user_id) 

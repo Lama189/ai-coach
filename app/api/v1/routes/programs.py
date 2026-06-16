@@ -25,7 +25,11 @@ router = APIRouter(prefix="/api/v1/programs", tags=["programs"])
     summary="Создать программу тренировок вручную",
     description="Создаёт программу тренировок из готовых данных без участия AI."
 )
-async def create_workout_program(dto: WorkoutProgramCreate, uow: IUnitOfWork = Depends(get_uow)):
+async def create_workout_program(
+    dto: WorkoutProgramCreate,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow)
+):
     service = WorkoutProgramService(uow)
     try:
         return await service.create_program(dto)
@@ -86,7 +90,11 @@ async def generate_workout_program(
     summary="Получить активную программу пользователя",
     description="Возвращает текущую активную программу тренировок для указанного пользователя.",
 )
-async def get_program_by_user_id(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)):
+async def get_program_by_user_id(
+    user_id: UUID,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow)
+):
     service = WorkoutProgramService(uow)
     try:
         return await service.get_actual_program_for_user(user_id)

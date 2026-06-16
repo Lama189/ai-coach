@@ -1,8 +1,6 @@
 import asyncio
 import pytest
-import pytest_asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import uuid4
+from unittest.mock import AsyncMock, MagicMock
 from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,7 +18,7 @@ from app.infrastructure.redis.repos.repository import RedisRepository
 @pytest.fixture(scope="session")
 def event_loop():
     loop = asyncio.new_event_loop()
-    yield loop
+    yield
     loop.close()
 
 
@@ -40,9 +38,8 @@ def sample_user_profile() -> UserProfile:
 
 
 @pytest.fixture
-def sample_user(sample_user_profile: UserProfile) -> User:
+def sample_user(sample_user_profile) -> User:
     return User(
-        id=uuid4(),
         username="testuser",
         phone="+998901234567",
         password_hash="hashed_password",
@@ -56,29 +53,36 @@ def sample_user(sample_user_profile: UserProfile) -> User:
 @pytest.fixture
 def mock_uow() -> IUnitOfWork:
     uow = AsyncMock(spec=IUnitOfWork)
+    
     uow.users = AsyncMock(spec=PostgresUserRepository)
     uow.exercises = AsyncMock(spec=PostgresExerciseRepository)
+
     uow.commit = AsyncMock()
     uow.rollback = AsyncMock()
+
     return uow
 
 
 @pytest.fixture
-def mock_redis_repo() -> RedisRepository:
+def mock_redis_repository() -> RedisRepository:
     repo = AsyncMock(spec=RedisRepository)
     return repo
 
 
 @pytest.fixture
-def mock_user_repository():
+def mock_user_repository() -> PostgresUserRepository:
     repo = AsyncMock(spec=PostgresUserRepository)
+    return repo
+
+
+def mock_exercise_repository() -> PostgresExerciseRepository:
+    repo = AsyncMock(spec=PostgresExerciseRepository)
     return repo
 
 
 @pytest.fixture
 def sample_exercise() -> Exercise:
     return Exercise(
-        id=uuid4(),
         name="Bench Press",
         muscle_group=MuscleGroup.CHEST,
         equipment="barbell",
@@ -88,11 +92,5 @@ def sample_exercise() -> Exercise:
 
 
 @pytest.fixture
-def mock_exercise_repository():
-    repo = AsyncMock(spec=PostgresExerciseRepository)
-    return repo
-
-
-@pytest.fixture
-def mock_exercise_session():
+def mock_exercise_session() -> AsyncSession:
     return AsyncMock(spec=AsyncSession)

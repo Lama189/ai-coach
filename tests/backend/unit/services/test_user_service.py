@@ -18,7 +18,7 @@ class TestUserService:
         service = UserService(mock_uow)
 
         user = await service.create_user(
-            username="newuser",
+            username="newuser", 
             password_hash="hashed_password",
             phone="+998901234567",
             telegram_id=123456789,
@@ -33,7 +33,7 @@ class TestUserService:
         mock_uow.commit.assert_called_once()
 
 
-    async def test_create_user_username_taken(self, mock_uow: IUnitOfWork, sample_user_profile: UserProfile):
+    async def test_create_username_taken(self, mock_uow: IUnitOfWork, sample_user_profile: UserProfile):
         mock_uow.users.exists_by.return_value = True
 
         service = UserService(mock_uow)
@@ -46,7 +46,7 @@ class TestUserService:
                 telegram_id=123456789,
                 profile=sample_user_profile,
             )
-        
+
         assert "уже занят" in str(exc_info.value)
         mock_uow.users.save.assert_not_called()
 

@@ -125,36 +125,18 @@ async def _run_generation(
         )
 
         async with uow_factory() as uow:
-
-            await uow.programs.deactivate_all_for_user(
-                user_id
-            )
-
-            await uow.programs.save(
-                domain_program,
-                task_uuid,
-            )
+            await uow.programs.deactivate_all_for_user(user_id)
+            await uow.programs.save(domain_program,task_uuid,)
 
             for day in domain_program.workout_days:
-
-                await uow.workout_days.save(
-                    day,
-                    domain_program.id,
-                )
+                await uow.workout_days.save(day, domain_program.id,)
 
                 for exercise in day.exercises:
-
-                    await uow.workout_days_exercise.save(
-                        exercise,
-                        day.id,
-                    )
+                    await uow.workout_days_exercise.save(exercise, day.id,)
 
             await uow.commit()
 
-        return generator.map_to_response(
-            domain_program,
-            exercise_names=exercise_names,
-        )
+        return generator.map_to_response(domain_program, exercise_names=exercise_names)
 
     finally:
         await worker_engine.dispose()

@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 from datetime import datetime, timezone
 
@@ -10,8 +10,7 @@ from app.domain.identity.user_profile import UserProfile
 from app.domain.enums import UserGender, FitnessGoal, ExperienceLevel
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.infrastructure.redis.repos.repository import RedisRepository
-from app.application.dependencies import get_uow, get_redis_repository
-from app.core.security import SecurityUtils
+from app.application.dependencies import get_uow, get_redis_repository, get_current_user
 from app.core.security import SecurityUtils
 
 
@@ -54,6 +53,29 @@ def sample_user(sample_user_profile):
         profile=sample_user_profile,
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
+    )
+
+
+@pytest.fixture
+def current_user():
+    now = datetime.now(timezone.utc)
+    return User(
+        id=uuid4(),
+        username="admin",
+        phone="+998901111111",
+        password_hash="hashed",
+        telegram_id=111111,
+        profile=UserProfile(
+            gender=UserGender.MALE,
+            age=25,
+            height_cm=180,
+            weight_kg=75,
+            goal=FitnessGoal.GAIN_MUSCLE,
+            experience_level=ExperienceLevel.INTERMEDIATE,
+            location=None,
+            created_at=now,
+            updated_at=now,
+        ),
     )
 
 
@@ -158,10 +180,11 @@ class TestUsersRouter:
         assert response.status_code == 404
 
 
-    async def test_get_user_by_telegram_id_success(self, mock_uow, sample_user):
+    async def test_get_user_by_telegram_id_success(self, mock_uow, sample_user, current_user):
         mock_uow.users.get_by.return_value = sample_user
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
+        app.dependency_overrides[get_current_user] = lambda: current_user
 
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -174,10 +197,11 @@ class TestUsersRouter:
         assert data["telegram_id"] == sample_user.telegram_id
 
 
-    async def test_get_user_by_telegram_id_not_found(self, mock_uow):
+    async def test_get_user_by_telegram_id_not_found(self, mock_uow, current_user):
         mock_uow.users.get_by.return_value = None
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
+        app.dependency_overrides[get_current_user] = lambda: current_user
 
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -188,10 +212,11 @@ class TestUsersRouter:
         assert response.status_code == 404
 
 
-    async def test_exists_by_phone_true(self, mock_uow):
+    async def test_exists_by_phone_true(self, mock_uow, current_user):
         mock_uow.users.exists_by.return_value = True
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
+        app.dependency_overrides[get_current_user] = lambda: current_user
 
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -203,10 +228,11 @@ class TestUsersRouter:
         assert response.json() is True
 
 
-    async def test_exists_by_phone_false(self, mock_uow):
+    async def test_exists_by_phone_false(self, mock_uow, current_user):
         mock_uow.users.exists_by.return_value = False
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
+        app.dependency_overrides[get_current_user] = lambda: current_user
 
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -218,10 +244,11 @@ class TestUsersRouter:
         assert response.json() is False
 
 
-    async def test_get_user_success(self, mock_uow, sample_user):
+    async def test_get_user_success(self, mock_uow, sample_user, current_user):
         mock_uow.users.get_by.return_value = sample_user
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
+        app.dependency_overrides[get_current_user] = lambda: current_user
 
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -234,10 +261,11 @@ class TestUsersRouter:
         assert data["username"] == sample_user.username
 
 
-    async def test_get_user_not_found(self, mock_uow):
+    async def test_get_user_not_found(self, mock_uow, current_user):
         mock_uow.users.get_by.return_value = None
 
         app.dependency_overrides[get_uow] = lambda: mock_uow
+        app.dependency_overrides[get_current_user] = lambda: current_user
 
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:

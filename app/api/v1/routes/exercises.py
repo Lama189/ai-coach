@@ -23,7 +23,8 @@ router = APIRouter(prefix="/api/v1/exercises", tags=["exercises"])
     status_code=status.HTTP_201_CREATED
 )
 async def create_exercise(
-    dto: CreateExerciseDTO, 
+    dto: CreateExerciseDTO,
+    current_user = Depends(get_current_user),
     uow: IUnitOfWork = Depends(get_uow),
     embedder: SentenceTransformerEmbeddingService = Depends(get_embedding_service)
 ):
@@ -48,6 +49,7 @@ async def create_exercise(
 )
 async def delete_exercise(
     exercise_id: UUID,
+    current_user = Depends(get_current_user),
     uow: IUnitOfWork = Depends(get_uow),
     embedder: SentenceTransformerEmbeddingService = Depends(get_embedding_service)
 ):
