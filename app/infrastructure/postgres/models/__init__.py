@@ -6,7 +6,9 @@ from app.infrastructure.postgres.models.workout_days import WorkoutDay
 from app.infrastructure.postgres.models.exercises import Exercise
 from app.infrastructure.postgres.models.work_day_exercises import WorkoutDayExercise
 from app.infrastructure.postgres.models.session import Session
-from app.infrastructure.postgres.models.exerc_set import ExerciseSet  
+from app.infrastructure.postgres.models.exerc_set import ExerciseSet
+from app.infrastructure.postgres.models.document import KnowledgeDocument
+from app.infrastructure.postgres.models.chunk import KnowledgeChunk
 
 __all__ = [
     "BaseModel",
@@ -18,4 +20,6 @@ __all__ = [
     "WorkoutDayExercise",
     "Session",
     "ExerciseSet",
+    "KnowledgeDocument",
+    "KnowledgeChunk",
 ]

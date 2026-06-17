@@ -78,7 +78,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: fitness_worker
-    command: celery -A app.application.workers.tasks worker --loglevel=info
+    command: celery -A app.application.workers.celery_app worker --loglevel=info
     environment:
       - DATABASE_URL=postgresql+asyncpg://${COACH_DB_USER:-postgres}:${COACH_DB_PASSWORD:-123}@postgres:5432/${COACH_DB_NAME:-ai_coach}
       - LLM_API_KEY=${LLM_API_KEY} 
@@ -169,6 +169,21 @@ services:
     networks:
       - app_network
     restart: unless-stopped
+  
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    networks:
+      - app_network
 
 volumes:
   pg_data:
@@ -179,6 +194,7 @@ volumes:
   worker_data:
   redis_data:
   loki_data:
+  minio_data:
 
 networks:
   app_network:

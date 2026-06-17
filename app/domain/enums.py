@@ -74,4 +74,11 @@ class Constraint(str, Enum):
     NO_HINGE = "no_hinge"             
     NO_HORIZONTAL_PRESS = "no_horizontal_press"  
     NO_CARRY = "no_carry"               
-    NO_BARBELL = "no_barbell"         
+    NO_BARBELL = "no_barbell"        
+
+
+class KnowledgeDocumentStatus(str, Enum):
+    UPLOADED = "uploaded"
+    PROCESSING = "processing"
+    PROCESSED = "processed"
+    FAILED = "failed" 

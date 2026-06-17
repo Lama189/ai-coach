@@ -9,7 +9,7 @@ class ExerciseSet:
     weight: float
     reps: int
     id: UUID = field(default_factory=uuid4)
-    rpe: Optional[int] = None 
+    rpe: int | None = None 
 
     def __post_init__(self):
         if self.set_number <= 0:
@@ -21,7 +21,7 @@ class ExerciseSet:
         if self.rpe is not None and not (1 <= self.rpe <= 10):
             raise ValueError("RPE должен быть в диапазоне от 1 до 10")
 
-    def update_result(self, weight: float, reps: int, rpe: Optional[int] = None) -> None:
+    def update_result(self, weight: float, reps: int, rpe: int | None = None) -> None:
         if weight < 0 or reps <= 0:
             raise ValueError("Некорректные значения веса или повторений")
         if rpe is not None and not (1 <= rpe <= 10):

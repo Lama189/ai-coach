@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     redis_url: str = ""
     secret_key: str = ""
     llm_api_key: str = "" 
+    minio_endpoint: str = ""
+    minio_access_key: str = ""
+    minio_secret_key: str = ""
+    minio_bucket: str = ""
 
     debug: bool = False
     algorithm: str = "HS256"

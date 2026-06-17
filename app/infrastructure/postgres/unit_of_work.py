@@ -12,6 +12,8 @@ from app.infrastructure.postgres.repos.workout_days import PostgresWorkoutDayRep
 from app.infrastructure.postgres.repos.workout_day_exercises import PostgresWorkoutDayExerciseRepository
 from app.infrastructure.postgres.repos.insights import PostgresUserInsightRepository
 from app.infrastructure.postgres.repos.intents import PostgresUserIntentRepository
+from app.infrastructure.postgres.repos.knowledge_document import PostgresKnowledgeDocumentRepository
+from app.infrastructure.postgres.repos.knowledge_chunk import PostgresKnowledgeChunkRepository
 
 
 class PostgresUnitOfWork(IUnitOfWork):
@@ -30,6 +32,8 @@ class PostgresUnitOfWork(IUnitOfWork):
         self.workout_days_exercise = PostgresWorkoutDayExerciseRepository(self._session)
         self.insights = PostgresUserInsightRepository(self._session)
         self.intents = PostgresUserIntentRepository(self._session)
+        self.knowledge_documents = PostgresKnowledgeDocumentRepository(self._session)
+        self.knowledge_chunks = PostgresKnowledgeChunkRepository(self._session)
 
         return self
     

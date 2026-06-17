@@ -10,9 +10,9 @@ from app.application.dto.program import (
     WorkoutProgramCreate, 
     WorkoutProgramResponse, 
     GenerateProgram, 
-    TaskAcceptedResponse
 )
-from app.application.workers.tasks import generate_workout_task
+from app.application.dto.tasks import TaskAcceptedResponse
+from app.application.workers.tasks.programs import generate_workout_task
 
 
 router = APIRouter(prefix="/api/v1/programs", tags=["programs"])
@@ -74,7 +74,11 @@ async def generate_workout_program(
             task_id=task_id 
         )
 
-        return TaskAcceptedResponse(task_id=task_id, status="processing")
+        return TaskAcceptedResponse(
+            task_id=task_id,
+            status="processing",
+            message="Генерация программы успешно запущена",
+        )
     
     except Exception as e:  
         raise HTTPException(
