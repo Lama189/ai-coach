@@ -9,7 +9,6 @@
 - [Описание](#описание)
 - [Возможности](#возможности)
 - [Стек технологий](#стек-технологий)
-- [Архитектура](#архитектура)
 - [Быстрый старт](#быстрый-старт)
 - [Конфигурация](#конфигурация)
 - [API Endpoints](#api-endpoints)
@@ -48,55 +47,25 @@ AI Coach — платформа для персонализированных т
 
 ## Стек технологий
 
-| Компонент | Технология |
-|-----------|------------|
-| Язык | Python 3.12 |
-| Web-фреймворк | FastAPI |
-| ORM | SQLAlchemy (async) |
-| БД | PostgreSQL 15 + pgvector |
-| Кэширование | Redis 7 |
-| Очередь задач | Celery + RabbitMQ |
-| LLM | Google Gemini (gemini-3.5-flash, gemini-3.1-flash-lite) |
-| Эмбеддинги | Sentence Transformers (all-MiniLM-L6-v2, 384d) |
-| Хранилище файлов | MinIO (S3-совместимый) |
-| Telegram-бот | aiogram 3 |
-| Миграции | Alembic |
-| Мониторинг | Prometheus + Grafana |
-| Логирование | Loki + Promtail (JSON structured logging) |
-| PDF-парсинг | PyPDF + langchain-text-splitters |
-| Токенизация | tiktoken |
-| Пакетный менеджер | uv |
-| Контейнеризация | Docker + Docker Compose |
-
----
-
-## Архитектура
-
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Telegram Bot │────▶│   FastAPI     │────▶│  PostgreSQL   │
-│  (aiogram 3)  │     │   REST API    │     │  + pgvector   │
-└──────────────┘     └──────┬───────┘     └──────────────┘
-                            │
-                     ┌──────┴───────┐
-                     │   Celery      │
-                     │   Worker      │
-                     └──────┬───────┘
-                            │
-              ┌─────────────┼─────────────┐
-              │             │             │
-        ┌─────┴─────┐ ┌────┴────┐ ┌─────┴─────┐
-        │   Redis    │ │ RabbitMQ│ │   MinIO    │
-        │  (кэш/FSM) │ │ (брокер)│ │ (файлы)   │
-        └───────────┘ └─────────┘ └───────────┘
-```
-
-Принципы:
-- **Чистая архитектура** — Domain → Application → Infrastructure
-- **Unit of Work** — транзакционное управление репозиториями
-- **Repository Pattern** — абстракции для каждого агрегата
-- **Dependency Injection** — FastAPI `Depends()` для всей инфраструктуры
-- **DTO Pattern** — Pydantic модели на границах API
+| Компонент         | Технология                                              |
+| ----------------- | ------------------------------------------------------- |
+| Язык              | Python 3.12                                             |
+| Web-фреймворк     | FastAPI                                                 |
+| ORM               | SQLAlchemy (async)                                      |
+| БД                | PostgreSQL 15 + pgvector                                |
+| Кэширование       | Redis 7                                                 |
+| Очередь задач     | Celery + RabbitMQ                                       |
+| LLM               | Google Gemini (gemini-3.5-flash, gemini-3.1-flash-lite) |
+| Эмбеддинги        | Sentence Transformers (all-MiniLM-L6-v2, 384d)          |
+| Хранилище файлов  | MinIO (S3-совместимый)                                  |
+| Telegram-бот      | aiogram 3                                               |
+| Миграции          | Alembic                                                 |
+| Мониторинг        | Prometheus + Grafana                                    |
+| Логирование       | Loki + Promtail (JSON structured logging)               |
+| PDF-парсинг       | PyPDF + langchain-text-splitters                        |
+| Токенизация       | tiktoken                                                |
+| Пакетный менеджер | uv                                                      |
+| Контейнеризация   | Docker + Docker Compose                                 |
 
 ---
 
@@ -126,6 +95,7 @@ docker compose ps
 ```
 
 Сервисы:
+
 - **API**: http://localhost:8000
 - **Swagger docs**: http://localhost:8000/docs
 - **RabbitMQ UI**: http://localhost:15672 (guest/guest)
@@ -158,18 +128,18 @@ python bot/main.py
 
 ### Переменные окружения (.env)
 
-| Переменная | Описание | Пример |
-|------------|----------|--------|
-| `DATABASE_URL` | URL подключения к PostgreSQL | `postgresql+asyncpg://postgres:postgres@postgres:5432/ai_coach` |
-| `REDIS_URL` | URL подключения к Redis | `redis://redis:6379/0` |
-| `SECRET_KEY` | Секретный ключ для JWT | `your-secret-key` |
-| `LLM_API_KEY` | API ключ Google Gemini | `your-gemini-api-key` |
-| `MINIO_ENDPOINT` | Адрес MinIO | `minio:9000` |
-| `MINIO_ACCESS_KEY` | Логин MinIO | `admin` |
-| `MINIO_SECRET_KEY` | Пароль MinIO | `admin123456` |
-| `MINIO_BUCKET` | Имя бакета для файлов | `knowledge` |
-| `BOT_TOKEN` | Токен Telegram-бота | `your-telegram-bot-token` |
-| `DEBUG` | Режим отладки | `false` |
+| Переменная         | Описание                     | Пример                                                          |
+| ------------------ | ---------------------------- | --------------------------------------------------------------- |
+| `DATABASE_URL`     | URL подключения к PostgreSQL | `postgresql+asyncpg://postgres:postgres@postgres:5432/ai_coach` |
+| `REDIS_URL`        | URL подключения к Redis      | `redis://redis:6379/0`                                          |
+| `SECRET_KEY`       | Секретный ключ для JWT       | `your-secret-key`                                               |
+| `LLM_API_KEY`      | API ключ Google Gemini       | `your-gemini-api-key`                                           |
+| `MINIO_ENDPOINT`   | Адрес MinIO                  | `minio:9000`                                                    |
+| `MINIO_ACCESS_KEY` | Логин MinIO                  | `admin`                                                         |
+| `MINIO_SECRET_KEY` | Пароль MinIO                 | `admin123456`                                                   |
+| `MINIO_BUCKET`     | Имя бакета для файлов        | `knowledge`                                                     |
+| `BOT_TOKEN`        | Токен Telegram-бота          | `your-telegram-bot-token`                                       |
+| `DEBUG`            | Режим отладки                | `false`                                                         |
 
 ---
 
@@ -177,52 +147,52 @@ python bot/main.py
 
 ### Авторизация и профиль (`/api/v1/users`)
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| `POST` | `/register` | Регистрация нового пользователя |
-| `POST` | `/login` | Авторизация (phone + password) |
-| `POST` | `/refresh` | Обновление access токена |
-| `POST` | `/logout` | Выход (инвалидация токенов) |
-| `GET` | `/telegram/{telegram_id}` | Получить пользователя по Telegram ID |
-| `GET` | `/exists/phone/{phone}` | Проверить существование номера |
-| `GET` | `/{user_id}` | Получить пользователя по UUID |
-| `PATCH` | `/profile` | Обновить профиль (пол, возраст, вес, цель и др.) |
+| Метод   | Путь                      | Описание                                         |
+| ------- | ------------------------- | ------------------------------------------------ |
+| `POST`  | `/register`               | Регистрация нового пользователя                  |
+| `POST`  | `/login`                  | Авторизация (phone + password)                   |
+| `POST`  | `/refresh`                | Обновление access токена                         |
+| `POST`  | `/logout`                 | Выход (инвалидация токенов)                      |
+| `GET`   | `/telegram/{telegram_id}` | Получить пользователя по Telegram ID             |
+| `GET`   | `/exists/phone/{phone}`   | Проверить существование номера                   |
+| `GET`   | `/{user_id}`              | Получить пользователя по UUID                    |
+| `PATCH` | `/profile`                | Обновить профиль (пол, возраст, вес, цель и др.) |
 
 ### Упражнения (`/api/v1/exercises`)
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| `POST` | `/` | Создать упражнение (с генерацией эмбеддинга) |
-| `DELETE` | `/{exercise_id}` | Удалить упражнение |
-| `POST` | `/batch` | Пакетное создание упражнений (async, через Celery) |
+| Метод    | Путь             | Описание                                           |
+| -------- | ---------------- | -------------------------------------------------- |
+| `POST`   | `/`              | Создать упражнение (с генерацией эмбеддинга)       |
+| `DELETE` | `/{exercise_id}` | Удалить упражнение                                 |
+| `POST`   | `/batch`         | Пакетное создание упражнений (async, через Celery) |
 
 ### Программы (`/api/v1/programs`)
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| `POST` | `/` | Создать программу вручную |
-| `POST` | `/generate` | Сгенерировать программу через ИИ (async, возвращает task_id) |
-| `GET` | `/{user_id}` | Получить активную программу пользователя |
+| Метод  | Путь         | Описание                                                     |
+| ------ | ------------ | ------------------------------------------------------------ |
+| `POST` | `/`          | Создать программу вручную                                    |
+| `POST` | `/generate`  | Сгенерировать программу через ИИ (async, возвращает task_id) |
+| `GET`  | `/{user_id}` | Получить активную программу пользователя                     |
 
 ### Инсайты (`/api/v1/insights`)
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| `POST` | `/` | Создать инсайт с тегом (injury/progress/fatigue/preference/schedule/nutrition/technique/mental) |
+| Метод  | Путь | Описание                                                                                        |
+| ------ | ---- | ----------------------------------------------------------------------------------------------- |
+| `POST` | `/`  | Создать инсайт с тегом (injury/progress/fatigue/preference/schedule/nutrition/technique/mental) |
 
 ### База знаний (`/api/v1/knowledge`)
 
-| Метод | Путь | Описание |
-|-------|------|----------|
+| Метод  | Путь      | Описание                                                         |
+| ------ | --------- | ---------------------------------------------------------------- |
 | `POST` | `/upload` | Загрузить PDF (async: парсинг → чанкинг → эмбеддинги → хранение) |
 
 ### Системные
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| `GET` | `/` | Health check |
+| Метод | Путь       | Описание           |
+| ----- | ---------- | ------------------ |
+| `GET` | `/`        | Health check       |
 | `GET` | `/metrics` | Prometheus метрики |
-| `GET` | `/docs` | Swagger UI |
+| `GET` | `/docs`    | Swagger UI         |
 
 ---
 
@@ -230,20 +200,20 @@ python bot/main.py
 
 ### Модели
 
-| Модель | Таблица | Описание |
-|--------|---------|----------|
-| `User` | `users` | Пользователь (id, telegram_id, username, phone, password_hash) |
-| `UserProfile` | `user_profiles` | Профиль (gender, age, height, weight, goal, experience_level, location) |
-| `Exercise` | `exercises` | Упражнение (name, muscle_group, equipment, movement_patterns, embedding) |
-| `WorkoutProgram` | `workout_programs` | Программа тренировок |
-| `WorkoutDay` | `workout_days` | День тренировки |
-| `WorkoutDayExercise` | `workout_day_exercises` | Упражнение в дне (sets, reps, rest) |
-| `Session` | `sessions` | Сессия тренировки |
-| `ExerciseSet` | `exercise_sets` | Подход (weight, reps, rpe) |
-| `UserInsight` | `user_insights` | Инсайт пользователя (content, tag, embedding) |
-| `UserIntentModel` | `user_intents` | Извлечённое намерение (goal, constraints, focus_areas) |
-| `KnowledgeDocument` | `knowledge_documents` | Загруженный документ |
-| `KnowledgeChunk` | `knowledge_chunks` | Чанк документа (content, embedding, token_count) |
+| Модель               | Таблица                 | Описание                                                                 |
+| -------------------- | ----------------------- | ------------------------------------------------------------------------ |
+| `User`               | `users`                 | Пользователь (id, telegram_id, username, phone, password_hash)           |
+| `UserProfile`        | `user_profiles`         | Профиль (gender, age, height, weight, goal, experience_level, location)  |
+| `Exercise`           | `exercises`             | Упражнение (name, muscle_group, equipment, movement_patterns, embedding) |
+| `WorkoutProgram`     | `workout_programs`      | Программа тренировок                                                     |
+| `WorkoutDay`         | `workout_days`          | День тренировки                                                          |
+| `WorkoutDayExercise` | `workout_day_exercises` | Упражнение в дне (sets, reps, rest)                                      |
+| `Session`            | `sessions`              | Сессия тренировки                                                        |
+| `ExerciseSet`        | `exercise_sets`         | Подход (weight, reps, rpe)                                               |
+| `UserInsight`        | `user_insights`         | Инсайт пользователя (content, tag, embedding)                            |
+| `UserIntentModel`    | `user_intents`          | Извлечённое намерение (goal, constraints, focus_areas)                   |
+| `KnowledgeDocument`  | `knowledge_documents`   | Загруженный документ                                                     |
+| `KnowledgeChunk`     | `knowledge_chunks`      | Чанк документа (content, embedding, token_count)                         |
 
 ### Связи
 
@@ -308,15 +278,15 @@ KnowledgeDocument 1──N KnowledgeChunk
 
 ### Ограничения
 
-| Ограничение | Исключённые паттерны |
-|-------------|---------------------|
-| `no_overhead` | push_vertical |
-| `no_shoulder_load` | push_vertical, pull_vertical |
-| `no_knee_load` | squat, lunge |
-| `no_hinge` | hinge |
-| `no_horizontal_press` | push_horizontal |
-| `no_carry` | carry |
-| `no_barbell` | barbell equipment |
+| Ограничение           | Исключённые паттерны         |
+| --------------------- | ---------------------------- |
+| `no_overhead`         | push_vertical                |
+| `no_shoulder_load`    | push_vertical, pull_vertical |
+| `no_knee_load`        | squat, lunge                 |
+| `no_hinge`            | hinge                        |
+| `no_horizontal_press` | push_horizontal              |
+| `no_carry`            | carry                        |
+| `no_barbell`          | barbell equipment            |
 
 ### База знаний (RAG)
 
@@ -330,13 +300,14 @@ KnowledgeDocument 1──N KnowledgeChunk
 
 ## Telegram-бот
 
-| Команда | Описание |
-|---------|----------|
-| `/start` | Приветственное сообщение |
-| `/auth` | Авторизация/регистрация (номер телефона → пароль) |
-| `/insight` | Создание инсайта (выбор тега → ввод текста) |
+| Команда    | Описание                                          |
+| ---------- | ------------------------------------------------- |
+| `/start`   | Приветственное сообщение                          |
+| `/auth`    | Авторизация/регистрация (номер телефона → пароль) |
+| `/insight` | Создание инсайта (выбор тега → ввод текста)       |
 
 Особенности:
+
 - FSM (машина состояний) через Redis
 - Автоматическая нормализация номеров (+998XXXXXXXXX)
 - HTTP-клиент с retry-логикой (3 попытки при 5xx/timeout)
@@ -346,11 +317,11 @@ KnowledgeDocument 1──N KnowledgeChunk
 
 ## Фоновые задачи
 
-| Задача | Описание |
-|--------|----------|
-| `add_exercises_batch` | Пакетное создание упражнений с эмбеддингами |
-| `generate_workout_task` | Полный AI-пайплайн генерации программы |
-| `upload_pdf_task` | Обработка PDF: парсинг → чанкинг → эмбеддинги → хранение |
+| Задача                  | Описание                                                 |
+| ----------------------- | -------------------------------------------------------- |
+| `add_exercises_batch`   | Пакетное создание упражнений с эмбеддингами              |
+| `generate_workout_task` | Полный AI-пайплайн генерации программы                   |
+| `upload_pdf_task`       | Обработка PDF: парсинг → чанкинг → эмбеддинги → хранение |
 
 ---
 
@@ -358,13 +329,13 @@ KnowledgeDocument 1──N KnowledgeChunk
 
 ### Метрики (Prometheus)
 
-| Метрика | Тип | Описание |
-|---------|-----|----------|
-| `http_requests_total` | Counter | Количество HTTP-запросов |
-| `http_request_duration_seconds` | Histogram | Время обработки запросов |
-| `llm_tokens_used_total` | Counter | Использованные токены LLM |
-| `llm_requests_total` | Counter | Запросы к LLM |
-| `llm_request_duration_seconds` | Histogram | Время ответа LLM |
+| Метрика                         | Тип       | Описание                  |
+| ------------------------------- | --------- | ------------------------- |
+| `http_requests_total`           | Counter   | Количество HTTP-запросов  |
+| `http_request_duration_seconds` | Histogram | Время обработки запросов  |
+| `llm_tokens_used_total`         | Counter   | Использованные токены LLM |
+| `llm_requests_total`            | Counter   | Запросы к LLM             |
+| `llm_request_duration_seconds`  | Histogram | Время ответа LLM          |
 
 ### Стек
 
