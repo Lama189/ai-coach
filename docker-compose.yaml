@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   postgres:
@@ -29,7 +30,7 @@ services:
     command: alembic upgrade head
     volumes:
       - .:/app
-      - /app/.venv
+      - venv_data:/app/.venv 
     depends_on:
       postgres:
         condition: service_healthy  
@@ -46,8 +47,10 @@ services:
     volumes:
       - .:/app
       - venv_data:/app/.venv
+      - hf_models_cache:/root/.cache/huggingface  
     environment:
       - DATABASE_URL=postgresql+asyncpg://${COACH_DB_USER:-postgres}:${COACH_DB_PASSWORD:-123}@postgres:5432/${COACH_DB_NAME:-ai_coach}
+      - HF_HOME=/root/.cache/huggingface  
     depends_on:
       migrations:
         condition: service_completed_successfully 
@@ -78,13 +81,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: fitness_worker
-    command: celery -A app.application.workers.celery_app worker --loglevel=info
+    command: celery -A app.application.workers.tasks.celery_app worker --loglevel=info
     environment:
       - DATABASE_URL=postgresql+asyncpg://${COACH_DB_USER:-postgres}:${COACH_DB_PASSWORD:-123}@postgres:5432/${COACH_DB_NAME:-ai_coach}
       - LLM_API_KEY=${LLM_API_KEY} 
+      - HF_HOME=/root/.cache/huggingface  
     volumes:
       - .:/app
-      - /app/.venv
+      - venv_data:/app/.venv
+      - hf_models_cache:/root/.cache/huggingface  
     depends_on:
       postgres:
         condition: service_healthy
@@ -191,10 +196,10 @@ volumes:
   grafana_data:
   venv_data:
   rabbitmq_data:
-  worker_data:
   redis_data:
   loki_data:
   minio_data:
+  hf_models_cache:  
 
 networks:
   app_network:

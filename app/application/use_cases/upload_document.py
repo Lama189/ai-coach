@@ -36,7 +36,7 @@ class DocumentUploadService:
                 bucket="knowledge",
                 object_name=object_name,
                 uploaded_by=user_id,
-                status=KnowledgeDocumentStatus.UPLOADED.value,
+                status=KnowledgeDocumentStatus.UPLOADED,
             )
 
             await uow.knowledge_documents.save(document)

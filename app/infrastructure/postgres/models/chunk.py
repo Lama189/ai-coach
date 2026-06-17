@@ -8,7 +8,7 @@ from pgvector.sqlalchemy import Vector
 from app.infrastructure.postgres.models.base_model import BaseModel
 
 
-EMBEDDING_DIM = 768
+EMBEDDING_DIM = 384
 
 
 class KnowledgeChunk(BaseModel):

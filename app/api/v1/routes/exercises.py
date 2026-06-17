@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
 from app.application.services.exercise_service import ExerciseService
-from app.application.workers.tasks.exercises import add_exercises_batch as add_exercises_batch_task
+from app.application.workers.tasks import add_exercises_batch as add_exercises_batch_task
 from app.application.dependencies import get_uow, get_embedding_service, get_current_user
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.application.interfaces.unit_of_work import IUnitOfWork

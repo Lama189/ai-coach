@@ -12,7 +12,7 @@ from app.application.dto.program import (
     GenerateProgram, 
 )
 from app.application.dto.tasks import TaskAcceptedResponse
-from app.application.workers.tasks.programs import generate_workout_task
+from app.application.workers.tasks import generate_workout_task
 
 
 router = APIRouter(prefix="/api/v1/programs", tags=["programs"])

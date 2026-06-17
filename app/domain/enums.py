@@ -78,7 +78,7 @@ class Constraint(str, Enum):
 
 
 class KnowledgeDocumentStatus(str, Enum):
-    UPLOADED = "uploaded"
-    PROCESSING = "processing"
-    PROCESSED = "processed"
-    FAILED = "failed" 
+    UPLOADED = "uploaded"      
+    PROCESSING = "processing"  
+    PROCESSED = "processed"    
+    FAILED = "failed"        

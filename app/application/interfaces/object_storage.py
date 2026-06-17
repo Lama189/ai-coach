@@ -4,12 +4,17 @@ from abc import ABC, abstractmethod
 class IObjectStorage(ABC):
 
     @abstractmethod
-    async def upload(self, bucket: str, object_name: str, data: bytes) -> str:
+    async def upload(
+        self, 
+        bucket_name: str, 
+        object_name: str, 
+        data: bytes,
+        filename: str | None = None
+    ) -> str:
         ...
-
     
     @abstractmethod
-    async def download(self, bucket: str, object_name: str) -> bytes:
+    async def download(self, bucket: str, object_name: str) -> tuple[bytes, str | None]:
         ...
 
     
