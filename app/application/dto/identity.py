@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, UUID4, Field, ConfigDict, field_validator
 
@@ -112,3 +111,5 @@ class InsightResponseDTO(BaseModel):
     tag: InsightTag
 
     model_config = ConfigDict(from_attributes=True)
+
+

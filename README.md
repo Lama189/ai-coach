@@ -442,7 +442,3 @@ ai-coach/
 ```
 
 ---
-
-## Лицензия
-
-Proprietary — All rights reserved.

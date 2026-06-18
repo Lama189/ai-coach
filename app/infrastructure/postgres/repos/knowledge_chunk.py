@@ -57,6 +57,25 @@ class PostgresKnowledgeChunkRepository(IKnowledgeChunkRepository):
         return [self._to_domain(m) for m in models]
 
 
+    async def search_similar(
+        self,
+        embedding: list[float],
+        limit: int = 5,
+        min_similarity: float = 0.6,
+    ) -> list[KnowledgeChunk]:
+        stmt = (
+            select(KnowledgeChunkModel)
+            .where(
+                1 - KnowledgeChunkModel.embedding.cosine_distance(embedding) >= min_similarity
+            )
+            .order_by(KnowledgeChunkModel.embedding.cosine_distance(embedding))
+            .limit(limit)
+        )
+        
+        models = (await self._session.execute(stmt)).scalars().all()
+        return [self._to_domain(m) for m in models]
+
+
     async def delete(self, chunk_id: UUID) -> None:
         model = await self._session.get(KnowledgeChunkModel, chunk_id)
         if model:

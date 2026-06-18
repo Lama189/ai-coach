@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
 from uuid import UUID
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.domain.enums import MovementPattern
 from app.domain.identity.insight import UserInsight, InsightBundle
@@ -69,3 +69,24 @@ class CandidateExercise(BaseModel):
 
 class ExerciseBundle(BaseModel):
     exercises: list[CandidateExercise]
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(description="Текст вопроса пользователя к ИИ-тренеру")
+
+
+class ChunkResponseDTO(BaseModel):
+    chunk_index: int = Field(..., description="Индекс чанка в документе")
+    document_name: str | None = Field(None, description="Название документа, откуда взят чанк")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ChatResponse(BaseModel):
+    answer: str = Field(..., description="Сгенерированный ИИ-тренером ответ пользлователю")
+    sources: list[ChunkResponseDTO] = Field(
+        default_factory=list,
+        description="Список фрагментов из базы знаний, которые были использованы для контекста"
+    )
+
+    model_config = ConfigDict(from_attributes=True)

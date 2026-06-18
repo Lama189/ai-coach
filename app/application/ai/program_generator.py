@@ -26,10 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class WorkoutProgramGenerator:
-    def __init__(
-        self,
-        api_key: str,
-    ) -> None:
+    def __init__(self, api_key: str) -> None:
         self._validator = WorkoutProgramValidator()
         self._llm = ChatGoogleGenerativeAI(
             google_api_key=api_key,
@@ -45,7 +42,6 @@ class WorkoutProgramGenerator:
         exercises: ExerciseBundle,
         appends_count: int = 2
     ) -> WorkoutProgramAI:
-
         structured_llm = self._llm.with_structured_output(
             WorkoutProgramAI,
             method="json_mode",
@@ -65,12 +61,7 @@ class WorkoutProgramGenerator:
         return result
 
 
-    def _build_prompt(
-        self,
-        context: PlanningContext,
-        exercises: ExerciseBundle,
-    ) -> str:
-
+    def _build_prompt(self, context: PlanningContext, exercises: ExerciseBundle) -> str:
         exercises_text = "\n".join(
             [
                 (

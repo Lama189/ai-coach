@@ -6,10 +6,8 @@ from collections.abc import AsyncGenerator
 import asyncio
 import hashlib
 import tiktoken
-from io import BytesIO
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pypdf import PdfReader
+from app.infrastructure.ai.text_splitter import LangChainPdfSplitterService
 
 
 from app.domain.enums import KnowledgeDocumentStatus
@@ -25,25 +23,6 @@ from app.infrastructure.logging.decorators import log_duration
 
 
 logger = logging.getLogger(__name__)
-
-
-def _split_to_chunks(pdf_bytes: bytes) -> list[str]:
-    pdf_file = BytesIO(pdf_bytes)
-    reader = PdfReader(pdf_file)
-
-    full_text = ""
-    for page in reader.pages:
-        text = page.extract_text()
-        if text:
-            full_text += text + "\n"
-
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, 
-        chunk_overlap=200
-    )
-
-    chunks = text_splitter.split_text(full_text)
-    return chunks
 
 
 def calculate_hash(text: str) -> str:
@@ -70,7 +49,8 @@ async def _async_process_pdf_pipeline(task_id: str, user_id: str, bucket_name: s
         logger.error("Failed to download PDF from MinIO: %s", e)
         raise e
 
-    chunks = _split_to_chunks(pdf_bytes)
+    text_splitter = LangChainPdfSplitterService()
+    chunks = text_splitter.split_pdf(pdf_bytes)
     document = Document(
         title=filename,
         filename=filename,

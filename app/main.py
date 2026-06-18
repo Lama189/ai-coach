@@ -12,11 +12,12 @@ from app.application.dependencies import get_embedding_service
 from app.infrastructure.storage.client import get_minio_client
 from app.infrastructure.storage.bucket_initializer import ensure_bucket_exists
 
-from app.api.v1.routes.users import router as users_router
-from app.api.v1.routes.exercises import router as exercises_router
-from app.api.v1.routes.programs import router as programs_router
-from app.api.v1.routes.insights import router as insights_router
-from app.api.v1.routes.knowledge import router as knowledge_router
+from app.api.v1.routers.users import router as users_router
+from app.api.v1.routers.exercises import router as exercises_router
+from app.api.v1.routers.programs import router as programs_router
+from app.api.v1.routers.insights import router as insights_router
+from app.api.v1.routers.knowledge import router as knowledge_router
+from app.api.v1.routers.chat import router as chat_router
 
 from app.api.v1.middlewares.req_id import RequestIDMiddleware
 
@@ -75,6 +76,7 @@ app.include_router(exercises_router)
 app.include_router(programs_router)
 app.include_router(insights_router)
 app.include_router(knowledge_router)
+app.include_router(chat_router)
 
 
 @app.exception_handler(ValueError)

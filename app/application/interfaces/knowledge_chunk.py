@@ -24,5 +24,14 @@ class IKnowledgeChunkRepository(ABC):
         ...
 
     @abstractmethod
+    async def search_similar(
+        self,
+        embedding: list[float],
+        limit: int = 5,
+        min_similarity: float = 0.6,
+    ) -> list[KnowledgeChunk]:
+        ...
+
+    @abstractmethod
     async def delete_by_document_id(self, document_id: UUID) -> None:
         ...

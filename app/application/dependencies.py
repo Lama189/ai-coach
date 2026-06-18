@@ -11,6 +11,8 @@ from app.core.security import SecurityUtils
 
 from app.infrastructure.postgres.unit_of_work import PostgresUnitOfWork
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
+from app.infrastructure.ai.llm_service import LLMService
+from app.infrastructure.ai.text_splitter import LangChainPdfSplitterService
 from app.infrastructure.redis.client import get_redis_client
 from app.infrastructure.redis.repos.repository import RedisRepository
 from app.infrastructure.storage.minio_storage import MinioStorage
@@ -37,8 +39,18 @@ def get_llm_api_key() -> str:
 
 
 @lru_cache(maxsize=1)
+def get_llm_service() -> LLMService:
+    return LLMService(api_key=settings.llm_api_key)
+
+
+@lru_cache(maxsize=1)
 def get_embedding_service() -> SentenceTransformerEmbeddingService:
     return SentenceTransformerEmbeddingService()
+
+
+@lru_cache(maxsize=1)
+def get_text_splitter_service() -> LangChainPdfSplitterService:
+    return LangChainPdfSplitterService(chunk_size=500, chunk_overlap=200)
 
 
 def get_redis_repository(
