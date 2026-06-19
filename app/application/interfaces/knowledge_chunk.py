@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from app.domain.knowledge.chunk import KnowledgeChunk
+from app.domain.knowledge.retrieved_chunk import RetrievedChunk
 
 
 class IKnowledgeChunkRepository(ABC):
@@ -29,7 +30,7 @@ class IKnowledgeChunkRepository(ABC):
         embedding: list[float],
         limit: int = 5,
         min_similarity: float = 0.6,
-    ) -> list[KnowledgeChunk]:
+    ) -> list[RetrievedChunk]:
         ...
 
     @abstractmethod

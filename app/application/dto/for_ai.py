@@ -78,6 +78,7 @@ class ChatRequest(BaseModel):
 class ChunkResponseDTO(BaseModel):
     chunk_index: int = Field(..., description="Индекс чанка в документе")
     document_name: str | None = Field(None, description="Название документа, откуда взят чанк")
+    similarity: float = Field(..., description="Косинусное сходство чанка с запросом")
 
     model_config = ConfigDict(from_attributes=True)
 

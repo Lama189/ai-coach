@@ -3,6 +3,7 @@ from app.application.dto.for_ai import ChatResponse, ChunkResponseDTO
 from app.infrastructure.ai.embedding_service import SentenceTransformerEmbeddingService
 from app.application.interfaces.llm import ILLMService
 from app.application.interfaces.unit_of_work import IUnitOfWork
+from app.domain.knowledge.retrieved_chunk import RetrievedChunk
 
 
 class ChatService:
@@ -26,23 +27,23 @@ class ChatService:
         similar_chunks = await self._uow.knowledge_chunks.search_similar(
             embedding=query_vector,
             limit=5,
-            min_similarity=0.6
+            min_similarity=0.3
         )
 
         if similar_chunks:
-            ordered_chunks = sorted(list(similar_chunks), key=lambda x: x.chunk_index)
-            
+            ordered = sorted(similar_chunks, key=lambda r: r.chunk.chunk_index)
             context_text = "\n\n".join([
-                f"[Чанк {chunk.chunk_index}]: {chunk.content}" 
-                for chunk in ordered_chunks
+                f"[Чанк {r.chunk.chunk_index}]: {r.chunk.content}"
+                for r in ordered
             ])
 
             sources_dto = [
                 ChunkResponseDTO(
-                    chunk_index=chunk.chunk_index,
-                    document_name=chunk.meta.get("filename", "Анатомия упражнений")
+                    chunk_index=r.chunk.chunk_index,
+                    document_name=r.chunk.meta.get("filename", "Анатомия упражнений"),
+                    similarity=r.similarity,
                 )
-                for chunk in ordered_chunks
+                for r in ordered
             ]
 
         ai_text_answer = await self._llm_service.generate(

@@ -50,7 +50,7 @@ def get_embedding_service() -> SentenceTransformerEmbeddingService:
 
 @lru_cache(maxsize=1)
 def get_text_splitter_service() -> LangChainPdfSplitterService:
-    return LangChainPdfSplitterService(chunk_size=500, chunk_overlap=200)
+    return LangChainPdfSplitterService()
 
 
 def get_redis_repository(

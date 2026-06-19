@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.knowledge.chunk import KnowledgeChunk
+from app.domain.knowledge.retrieved_chunk import RetrievedChunk
 from app.application.interfaces.knowledge_chunk import IKnowledgeChunkRepository
 from app.infrastructure.postgres.models.chunk import KnowledgeChunk as KnowledgeChunkModel
 
@@ -62,18 +63,24 @@ class PostgresKnowledgeChunkRepository(IKnowledgeChunkRepository):
         embedding: list[float],
         limit: int = 5,
         min_similarity: float = 0.6,
-    ) -> list[KnowledgeChunk]:
+    ) -> list[RetrievedChunk]:
+        similarity_expr = 1 - KnowledgeChunkModel.embedding.cosine_distance(embedding)
+
         stmt = (
-            select(KnowledgeChunkModel)
-            .where(
-                1 - KnowledgeChunkModel.embedding.cosine_distance(embedding) >= min_similarity
-            )
-            .order_by(KnowledgeChunkModel.embedding.cosine_distance(embedding))
+            select(KnowledgeChunkModel, similarity_expr.label("similarity"))
+            .where(similarity_expr >= min_similarity)
+            .order_by(similarity_expr)
             .limit(limit)
         )
-        
-        models = (await self._session.execute(stmt)).scalars().all()
-        return [self._to_domain(m) for m in models]
+
+        rows = (await self._session.execute(stmt)).all()
+        return [
+            RetrievedChunk(
+                chunk=self._to_domain(row[0]),
+                similarity=float(row[1]),
+            )
+            for row in rows
+        ]
 
 
     async def delete(self, chunk_id: UUID) -> None:

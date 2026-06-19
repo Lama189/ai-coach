@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     minio_access_key: str = ""
     minio_secret_key: str = ""
     minio_bucket: str = ""
+    llama_cloud_api_key: str = ""
 
     debug: bool = False
     algorithm: str = "HS256"
