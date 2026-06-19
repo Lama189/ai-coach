@@ -6,11 +6,19 @@ from redis.asyncio import Redis
 
 from app.core.extensions import UserNotFoundError, InvalidPasswordError
 from app.application.services.user_service import UserService, AuthService
+from app.application.services.user_schedule_service import UserScheduleService
 from app.application.dependencies import get_uow, get_redis_repository, get_current_user
 from app.application.interfaces.unit_of_work import IUnitOfWork
 from app.core.security import SecurityUtils
-from app.application.dto.identity import UserCreateDTO, UserResponseDTO, LoginDTO, UserProfileUpdateDTO
 from app.application.dto.tokens import TokenResponseDTO, RefreshTokenDTO
+from app.application.dto.identity import (
+    UserCreateDTO, 
+    UserResponseDTO, 
+    LoginDTO,
+    UserProfileUpdateDTO,
+    UserScheduleDayCreateDTO, 
+    UserScheduleDayResponse,
+)
 
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
@@ -115,6 +123,69 @@ async def logout(
     await service.logout(user_id=str(current_user.id))
 
 
+@router.post(
+    path="/schedule/add_day",
+    response_model=UserScheduleDayResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_schedule(
+    dto: UserScheduleDayCreateDTO,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow),
+):
+    service = UserScheduleService(uow)
+    schedule = await service.create_schedule(
+        user_id=current_user.id,
+        day_of_week=dto.day_of_week,
+        training_day_number=dto.training_day_number,
+    )
+    return UserScheduleDayResponse.model_validate(schedule)
+
+
+@router.get(
+    path="/schedule",
+    response_model=list[UserScheduleDayResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def list_schedule(
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow),
+):
+    service = UserScheduleService(uow)
+    schedules = await service.list_all_by_user(current_user.id)
+    return [UserScheduleDayResponse.model_validate(s) for s in schedules]
+
+
+@router.get(
+    path="/schedule/{day_of_week}",
+    response_model=UserScheduleDayResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_schedule_by_day(
+    day_of_week: int,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow),
+):
+    service = UserScheduleService(uow)
+    schedule = await service.get_by_day(user_id=current_user.id, day_of_week=day_of_week)
+    if not schedule:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule not found")
+    return UserScheduleDayResponse.model_validate(schedule)
+
+
+@router.delete(
+    path="/schedule/{day_of_week}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_schedule_by_day(
+    day_of_week: int,
+    current_user = Depends(get_current_user),
+    uow: IUnitOfWork = Depends(get_uow),
+):
+    service = UserScheduleService(uow)
+    await service.delete_by_day(user_id=current_user.id, day_of_week=day_of_week)
+
+
 @router.get(
     path="/{user_id}",
     response_model=UserResponseDTO,
@@ -144,8 +215,10 @@ async def update_profile(
     uow: IUnitOfWork = Depends(get_uow)
 ):
     service = UserService(uow)
+
     try:
         user = await service.update_profile(user_id=current_user.id, dto=dto)
         return UserResponseDTO.model_validate(user)
+    
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

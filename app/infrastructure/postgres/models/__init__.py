@@ -9,6 +9,7 @@ from app.infrastructure.postgres.models.session import Session
 from app.infrastructure.postgres.models.exerc_set import ExerciseSet
 from app.infrastructure.postgres.models.document import KnowledgeDocument
 from app.infrastructure.postgres.models.chunk import KnowledgeChunk
+from app.infrastructure.postgres.models.user_schedule import UserSchedule
 
 __all__ = [
     "BaseModel",
@@ -22,4 +23,5 @@ __all__ = [
     "ExerciseSet",
     "KnowledgeDocument",
     "KnowledgeChunk",
+    "UserSchedule",
 ]

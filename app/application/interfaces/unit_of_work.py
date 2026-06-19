@@ -7,6 +7,7 @@ from app.application.interfaces.insights import IUserInsightRepository
 from app.application.interfaces.intents import IUserIntentRepository
 from app.application.interfaces.knowledge_document import IKnowledgeDocumentRepository
 from app.application.interfaces.knowledge_chunk import IKnowledgeChunkRepository
+from app.application.interfaces.user_schedule import IUserScheduleRepository
 
 
 class IUnitOfWork:
@@ -19,6 +20,7 @@ class IUnitOfWork:
     intents: IUserIntentRepository
     knowledge_documents: IKnowledgeDocumentRepository
     knowledge_chunks: IKnowledgeChunkRepository
+    user_schedules: IUserScheduleRepository
 
     async def commit(self) -> None: ...
     async def rollback(self) -> None: ...

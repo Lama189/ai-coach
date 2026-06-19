@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from app.infrastructure.postgres.models.profiles import UserProfile
     from app.infrastructure.postgres.models.workout_programs import WorkoutProgram
     from app.infrastructure.postgres.models.session import Session
+    from app.infrastructure.postgres.models.user_schedule import UserSchedule
 
 
 class User(BaseModel):
@@ -42,3 +43,4 @@ class User(BaseModel):
     profile: Mapped["UserProfile"] = relationship("UserProfile", back_populates="user", uselist=False)
     workout_programs: Mapped[list["WorkoutProgram"]] = relationship("WorkoutProgram", back_populates="user")
     sessions: Mapped[list["Session"]] = relationship("Session", back_populates="user")
+    user_schedules: Mapped[list["UserSchedule"]] = relationship("UserSchedule", back_populates="user")

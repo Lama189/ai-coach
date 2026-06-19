@@ -14,6 +14,7 @@ from app.infrastructure.postgres.repos.insights import PostgresUserInsightReposi
 from app.infrastructure.postgres.repos.intents import PostgresUserIntentRepository
 from app.infrastructure.postgres.repos.knowledge_document import PostgresKnowledgeDocumentRepository
 from app.infrastructure.postgres.repos.knowledge_chunk import PostgresKnowledgeChunkRepository
+from app.infrastructure.postgres.repos.user_schedule import PostgresUserScheduleRepository
 
 
 class PostgresUnitOfWork(IUnitOfWork):
@@ -34,6 +35,7 @@ class PostgresUnitOfWork(IUnitOfWork):
         self.intents = PostgresUserIntentRepository(self._session)
         self.knowledge_documents = PostgresKnowledgeDocumentRepository(self._session)
         self.knowledge_chunks = PostgresKnowledgeChunkRepository(self._session)
+        self.user_schedules = PostgresUserScheduleRepository(self._session)
 
         return self
     

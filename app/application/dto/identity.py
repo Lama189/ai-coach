@@ -113,3 +113,15 @@ class InsightResponseDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class UserScheduleDayCreateDTO(BaseModel):
+    day_of_week: int = Field(ge=0, le=6)
+    training_day_number: int = Field(ge=1)
+
+
+class UserScheduleDayResponse(BaseModel):
+    id: UUID4
+    user_id: UUID4
+    day_of_week: int
+    training_day_number: int
+
+    model_config = ConfigDict(from_attributes=True)

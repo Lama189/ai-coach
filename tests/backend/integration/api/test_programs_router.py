@@ -204,7 +204,7 @@ class TestProgramsRouterGenerate:
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             with patch(
-                "app.api.v1.routes.programs.generate_workout_task"
+                "app.api.v1.routers.programs.generate_workout_task"
             ) as mock_task:
                 response = await client.post(
                     "/api/v1/programs/generate",

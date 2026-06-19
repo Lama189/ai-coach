@@ -135,7 +135,7 @@ class TestExercisesRouter:
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             with patch(
-                "app.api.v1.routes.exercises.add_exercises_batch_task"
+                "app.api.v1.routers.exercises.add_exercises_batch_task"
             ) as mock_task:
                 response = await client.post(
                     "/api/v1/exercises/batch",
